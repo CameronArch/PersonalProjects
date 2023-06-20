@@ -1,3 +1,3 @@
 # PersonalProjects
 
-This repository contains all person projets developed and completed by Cameron Arch.
+This repository contains all person projects developed and completed by Cameron Arch.
