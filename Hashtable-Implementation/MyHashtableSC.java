@@ -37,11 +37,11 @@ class MyHashtableSC<K,V> {
     * value - Reference to the value of entry.
     * next - Reference to next entry in Linked List for separate chaining.
     */
-    private class HashEntry<K,V> {
+    private class HashEntry {
         
         private K key;
         private V value;
-        private HashEntry<K,V> next;
+        private HashEntry next;
         
         /** 
          * Contructor to create a HashEntry.
@@ -85,7 +85,7 @@ class MyHashtableSC<K,V> {
          * 
          * @return the next entry or null
          */
-        public HashEntry<K,V> getNext() {
+        public HashEntry getNext() {
             return next;
         }
         /** 
@@ -94,7 +94,7 @@ class MyHashtableSC<K,V> {
          * 
          * @param entry HashEntry to be referenced by next
          */
-        public void setNext(HashEntry<K,V> entry) {
+        public void setNext(HashEntry entry) {
             next = entry;
         }
     }
@@ -174,7 +174,7 @@ class MyHashtableSC<K,V> {
             return null;
         }
 
-        HashEntry<K,V> entry = (HashEntry<K,V>) data[key.hashCode() % data.length];
+        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -204,7 +204,7 @@ class MyHashtableSC<K,V> {
             return false;
         }
 
-        HashEntry<K,V> entry = (HashEntry<K,V>) data[key.hashCode() % data.length];
+        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -234,12 +234,12 @@ class MyHashtableSC<K,V> {
         }
 
         if (data[key.hashCode() % data.length] == null) {
-            data[key.hashCode() % data.length] = new HashEntry<>(key, value);
+            data[key.hashCode() % data.length] = new HashEntry(key, value);
             size++;
             return null;
         }
 
-        HashEntry<K,V> entry = (HashEntry<K,V>) data[key.hashCode() % data.length];
+        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -251,7 +251,7 @@ class MyHashtableSC<K,V> {
             return replacedValue;
         }
 
-        entry.setNext(new HashEntry<>(key,value)); 
+        entry.setNext(new HashEntry(key,value)); 
         size++;
         return null;
     }
@@ -264,7 +264,7 @@ class MyHashtableSC<K,V> {
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] != null) {
-                HashEntry<K,V> entry = (HashEntry<K,V>) data[i];
+                HashEntry entry = (HashEntry) data[i];
                 newData[entry.getKey().hashCode() % newData.length] = entry;
             }
         }
