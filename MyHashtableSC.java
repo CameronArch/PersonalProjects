@@ -123,19 +123,23 @@ class MyHashtableSC<K,V> {
         this.loadFactor = loadFactor;
         size = 0;
     }
-    
+    /** 
+    * Method to get size of Hashtable.
+    * 
+    * @return the size
+    */
     public int size() {
         return size;
     }
-
+    /** 
+    * Method to tell if Hashtable is empty.
+    * 
+    * @return true or false depending on if Hashtable is empty
+    */
     public boolean isEmpty() {
         return size == 0;
     }
-
-    public double getCurrentLoadFactor() {
-        return size / data.length;
-    }
-
+    
     public V put(K key, V value) {
         if (key == null || value == null) {
             throw new NullPointerException();
@@ -143,7 +147,10 @@ class MyHashtableSC<K,V> {
 
 
     }
-
+    /** 
+    * Method to expand the capacity of the Hashtable and rehash
+    * entries into larger array.
+    */
     protected void rehash() {
         Object[] newData = new Object[(data.length << 1) + 1];
 
@@ -155,5 +162,5 @@ class MyHashtableSC<K,V> {
         }
     }
 
-    
+
 }
