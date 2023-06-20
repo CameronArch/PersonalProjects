@@ -71,6 +71,14 @@ class MyHashtableSC<K,V> {
             return value;
         }
         /** 
+         * Method to set a new value for this HashEntry.
+         * 
+         * @param value the new value to replace previous value 
+         */
+        public void setValue(V value) {
+            this.value = value;
+        }
+        /** 
          * Method to get the entry after this HashEntry
          * if there is separate chaining. Returns null if 
          * there is no next entry.
@@ -79,6 +87,15 @@ class MyHashtableSC<K,V> {
          */
         public HashEntry<K,V> getNext() {
             return next;
+        }
+        /** 
+         * Method to set next reference for this HashEntry
+         * to given HashEntry. 
+         * 
+         * @param entry HashEntry to be referenced by next
+         */
+        public void setNext(HashEntry<K,V> entry) {
+            next = entry;
         }
     }
     
@@ -139,13 +156,100 @@ class MyHashtableSC<K,V> {
     public boolean isEmpty() {
         return size == 0;
     }
-    
+    /** 
+    * Method to get the value of an entry given a key. The 
+    * key cannot be null. The method returns null if no such key
+    * exists in Hashtable.
+    * 
+    * @param key the key of entry to get
+    *
+    * @return the value of the entry with matching key or null otherwise
+    */
+    public V get(K key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
+
+        if (data[key.hashCode() % data.length] == null) {
+            return null;
+        }
+
+        HashEntry<K,V> entry = (HashEntry<K,V>) data[key.hashCode() % data.length];
+
+        while (entry.getNext() != null && !key.equals(entry.getKey())) {
+            entry = entry.getNext();
+        }
+
+        if (key.equals(entry.getKey())) {
+            return entry.getValue();
+        }
+
+        return null;
+    }
+    /** 
+    * Method to see if entry with given key exists. The 
+    * key cannot be null. The method returns false if no such key
+    * exists in Hashtable and true otherwise.
+    * 
+    * @param key the key to check for
+    *
+    * @return true or false depending on if key matches existing entry
+    */
+    public boolean containsKey(K key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
+        
+        if (data[key.hashCode() % data.length] == null) {
+            return false;
+        }
+
+        HashEntry<K,V> entry = (HashEntry<K,V>) data[key.hashCode() % data.length];
+
+        while (entry.getNext() != null && !key.equals(entry.getKey())) {
+            entry = entry.getNext();
+        }
+
+        return key.equals(entry.getKey());
+    }
+    /** 
+    * Method to add an entry to the Hashtable. The arguments cannot be null.
+    * Method adds a new HashEntry if none exist currently in Hashtable with 
+    * the same key, otherwise the value of entry with the same key is replace
+    * by given value.
+    * 
+    * @param key the key of the entry to add
+    * @param value the value of the entry to add
+    *
+    * @return null if new HashEntry was created or the replaced value if there
+    * was a matching key.
+    */
     public V put(K key, V value) {
         if (key == null || value == null) {
             throw new NullPointerException();
         }
 
+        if (data[key.hashCode() % data.length] == null) {
+            data[key.hashCode() % data.length] = new HashEntry<>(key, value);
+            size++;
+            return null;
+        }
 
+        HashEntry<K,V> entry = (HashEntry<K,V>) data[key.hashCode() % data.length];
+
+        while (entry.getNext() != null && !key.equals(entry.getKey())) {
+            entry = entry.getNext();
+        }
+
+        if (key.equals(entry.getKey())) {
+            V replacedValue = entry.getValue();
+            entry.setValue(value);
+            return replacedValue;
+        }
+
+        entry.setNext(new HashEntry<>(key,value)); 
+        size++;
+        return null;
     }
     /** 
     * Method to expand the capacity of the Hashtable and rehash
