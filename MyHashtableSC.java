@@ -19,6 +19,7 @@
  * loadFactor - Reference to maximum load factor for Hashtable before resize.
 */
 class MyHashtableSC<K,V> {
+    
     Object[] data;
     int size;
     double loadFactor;
@@ -37,35 +38,90 @@ class MyHashtableSC<K,V> {
     * next - Reference to next entry in Linked List for separate chaining.
     */
     private class HashEntry<K,V> {
+        
         private K key;
         private V value;
         private HashEntry<K,V> next;
-
+        
+        /** 
+         * Contructor to create a HashEntry. 
+         * 
+         * @param key the key for this HashEntry
+         * @param value the value for this HashEntry
+         */
         public HashEntry(K key, V value) {
             this.key = key;
             this.value = value;
             this.next = null;
         }
-
+        /** 
+         * Method to get the key of this HashEntry. 
+         * 
+         * @return the key
+         */
         public K getKey() {
             return key;
         }
-
+        /** 
+         * Method to get the value of this HashEntry. 
+         * 
+         * @return the value
+         */
         public V getValue() {
             return value;
         }
-
+        /** 
+         * Method to get the entry after this HashEntry
+         * if there is separate chaining. Returns null if 
+         * there is no next entry.
+         * 
+         * @return the next entry or null
+         */
         public HashEntry<K,V> getNext() {
             return next;
         }
     }
-
+    
+    /** 
+    * Default contructor to create MyHashtableSC. 
+    */
     public MyHashtableSC() {
         data = new Object[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
-
-
+    /** 
+    * Contructor to create MyHashtableSC with a specified
+    * initial capacity. The inital capacity cannot be less than 0.
+    * 
+    * @param initialCapacity the initial capacity for this MyHashtableSC
+    */
+    public MyHashtableSC(int initialCapacity) {
+        if (initialCapacity < 0) {
+            throw new IllegalArgumentException();
+        }
+        
+        data = new Object[initialCapacity];
+        loadFactor = DEFAULT_LOAD_FACTOR;
+        size = 0;
+    }
+    /** 
+    * Contructor to create MyHashtableSC with a specified
+    * initial capacity and maximum load factor. The inital capacity 
+    * cannot be less than 0 and the load factor cannot be less than
+    * or equal to zero.
+    * 
+    * @param initialCapacity the initial capacity for this MyHashtableSC
+    * @param loadFactor the maximum load factor for this MyHashtableSC
+    */
+    public MyHashtableSC(int initialCapacity, double loadFactor) {
+        if (initialCapacity < 0 || loadFactor <= 0) {
+            throw new IllegalArgumentException();
+        }
+        
+        data = new Object[initialCapacity];
+        this.loadFactor = loadFactor;
+        size = 0;
+    }
 
 }
