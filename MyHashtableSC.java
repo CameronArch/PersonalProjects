@@ -44,7 +44,7 @@ class MyHashtableSC<K,V> {
         private HashEntry<K,V> next;
         
         /** 
-         * Contructor to create a HashEntry. 
+         * Contructor to create a HashEntry.
          * 
          * @param key the key for this HashEntry
          * @param value the value for this HashEntry
@@ -123,5 +123,37 @@ class MyHashtableSC<K,V> {
         this.loadFactor = loadFactor;
         size = 0;
     }
+    
+    public int size() {
+        return size;
+    }
 
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public double getCurrentLoadFactor() {
+        return size / data.length;
+    }
+
+    public V put(K key, V value) {
+        if (key == null || value == null) {
+            throw new NullPointerException();
+        }
+
+
+    }
+
+    protected void rehash() {
+        Object[] newData = new Object[(data.length << 1) + 1];
+
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] != null) {
+                HashEntry<K,V> entry = (HashEntry<K,V>) data[i];
+                newData[entry.getKey().hashCode() % newData.length] = entry;
+            }
+        }
+    }
+
+    
 }
