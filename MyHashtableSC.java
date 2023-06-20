@@ -229,6 +229,10 @@ class MyHashtableSC<K,V> {
             throw new NullPointerException();
         }
 
+        if ((double) (size + 1) / (double) data.length > loadFactor) {
+            rehash();
+        }
+
         if (data[key.hashCode() % data.length] == null) {
             data[key.hashCode() % data.length] = new HashEntry<>(key, value);
             size++;
