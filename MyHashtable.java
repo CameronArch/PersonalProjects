@@ -1,0 +1,5 @@
+
+
+class MyHashtable<K,V> {
+    
+}
