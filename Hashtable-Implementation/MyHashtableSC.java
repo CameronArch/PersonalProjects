@@ -348,6 +348,7 @@ class MyHashtableSC<K,V> {
                     data[i] = null;
                 }
             }
+            size = 0;
         }
     }
 }
