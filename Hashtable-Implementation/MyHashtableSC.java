@@ -193,7 +193,7 @@ class MyHashtableSC<K,V> {
     * 
     * @param key the key to check for
     *
-    * @return true or false depending on if key matches existing entry
+    * @return true if key matches existing entry, false otherwise
     */
     public boolean containsKey(K key) {
         if (key == null) {
@@ -291,6 +291,7 @@ class MyHashtableSC<K,V> {
         if (key.equals(entry.getKey())) {
             V removedValue = entry.getValue();
             data[key.hashCode() % data.length] = entry.getNext();
+            size--;
             return removedValue;
         }
 
@@ -301,10 +302,52 @@ class MyHashtableSC<K,V> {
         if (key.equals(entry.getNext().getKey())) {
             V removedValue = entry.getNext().getValue();
             entry.setNext(entry.getNext().getNext());
+            size--;
             return removedValue;
         }
 
         return null;
     }
+    /** 
+    * Method to see given value exists one or more times in Hashtable. 
+    * The value cannot be null. The method returns false if no such value
+    * exists in Hashtable and true otherwise.
+    * 
+    * @param value the value to check for
+    *
+    * @return true if one or more of value exists in the hashtable,
+    * false otherwise
+    */
+    public boolean containsValue(V value) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
 
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] instanceof Object) {
+                HashEntry entry = (HashEntry) data[i];
+                while (entry != null) {
+                    if (value.equals(entry.getValue())) {
+                        return true;
+                    }
+
+                    entry = entry.getNext();
+                }
+            }
+        }
+
+        return false;
+    }
+    /** 
+    * Method to clear Hashtable of all entries.
+    */
+    public void clear() {
+        if (size > 0) {
+            for (int i = 0; i < data.length; i++) {
+                if (data[i] instanceof Object) {
+                    data[i] = null;
+                }
+            }
+        }
+    }
 }
