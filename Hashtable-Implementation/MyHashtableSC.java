@@ -37,7 +37,7 @@ class MyHashtableSC<K,V> {
     * value - Reference to the value of entry.
     * next - Reference to next entry in Linked List for separate chaining.
     */
-    private class HashEntry {
+    protected class HashEntry {
         
         private K key;
         private V value;
