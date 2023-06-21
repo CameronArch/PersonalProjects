@@ -7,6 +7,7 @@
   MyHashtableSC and MyHashtableLP.
 */
 import org.junit.*;
+
 import static org.junit.Assert.*;
 /** 
 * A HashtableTester class for testing MyHashtableSC and MyHashtableLP. 
@@ -14,7 +15,7 @@ import static org.junit.Assert.*;
 public class HashtableTester {
 
     @Test
-    public void contructorSCTest() {
+    public void testContructorSC() {
         MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
         
         assertEquals(0,test.size);
@@ -39,4 +40,20 @@ public class HashtableTester {
         assertThrows(IllegalArgumentException.class,
                 () -> new MyHashtableSC<>(-1,1));
     }
+
+    @Test
+    public void testPutSC() {
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
+
+        assertThrows(NullPointerException.class,
+                () -> test.put(null,1));
+        assertThrows(NullPointerException.class,
+                () -> test.put("one",null));
+
+        assertEquals(null,test.put("one",1));
+        assertEquals(1,test.size);
+        assertEquals(1,(HashEntry) test.data["one".hashCode() % 11].getValue());
+
+    }
 }
+
