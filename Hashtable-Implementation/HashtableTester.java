@@ -8,8 +8,8 @@
 */
 
 /** 
- * A HashtableTester class for testing MyHashtableSC and MyHashtableLP. 
+* A HashtableTester class for testing MyHashtableSC and MyHashtableLP. 
 */
 class HashtableTester {
-    
+
 }

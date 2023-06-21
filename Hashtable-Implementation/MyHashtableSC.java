@@ -275,7 +275,8 @@ class MyHashtableSC<K,V> {
     * 
     * @param key the key of the entry to remove
     *
-    * @return the value of the removed entry or null if no entry exists with given key.
+    * @return the value of the removed entry or null if no entry exists 
+    * with given key.
     */
     public V remove(K key) {
         if (key == null) {
@@ -295,7 +296,8 @@ class MyHashtableSC<K,V> {
             return removedValue;
         }
 
-        while (entry.getNext() != null && !key.equals(entry.getNext().getKey())) {
+        while (entry.getNext() != null && 
+                !key.equals(entry.getNext().getKey())) {
             entry = entry.getNext();
         }
 
