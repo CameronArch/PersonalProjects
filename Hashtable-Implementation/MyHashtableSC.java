@@ -269,6 +269,42 @@ class MyHashtableSC<K,V> {
             }
         }
     }
+    /** 
+    * Method to remove an entry from the Hashtable. The argument cannot be null.
+    * Method returns null if no entry exists with given key.
+    * 
+    * @param key the key of the entry to remove
+    *
+    * @return the value of the removed entry or null if no entry exists with given key.
+    */
+    public V remove(K key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
 
+        if (data[key.hashCode() % data.length] == null) {
+            return null;
+        }
+
+        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
+
+        if (key.equals(entry.getKey())) {
+            V removedValue = entry.getValue();
+            data[key.hashCode() % data.length] = entry.getNext();
+            return removedValue;
+        }
+
+        while (entry.getNext() != null && !key.equals(entry.getNext().getKey())) {
+            entry = entry.getNext();
+        }
+
+        if (key.equals(entry.getNext().getKey())) {
+            V removedValue = entry.getNext().getValue();
+            entry.setNext(entry.getNext().getNext());
+            return removedValue;
+        }
+
+        return null;
+    }
 
 }
