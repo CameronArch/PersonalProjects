@@ -20,7 +20,7 @@
 */
 class MyHashtableSC<K,V> {
     
-    Object[] data;
+    HashEntry[] data;
     int size;
     double loadFactor;
     
@@ -103,7 +103,7 @@ class MyHashtableSC<K,V> {
     * Default contructor to create MyHashtableSC. 
     */
     public MyHashtableSC() {
-        data = new Object[DEFAULT_CAPACITY];
+        data = (HashEntry[]) new Object[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -118,7 +118,7 @@ class MyHashtableSC<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = new Object[initialCapacity];
+        data = (HashEntry[]) new Object[initialCapacity];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -136,7 +136,7 @@ class MyHashtableSC<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = new Object[initialCapacity];
+        data = (HashEntry[]) new Object[initialCapacity];
         this.loadFactor = loadFactor;
         size = 0;
     }
@@ -174,7 +174,7 @@ class MyHashtableSC<K,V> {
             return null;
         }
 
-        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
+        HashEntry entry = data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -204,7 +204,7 @@ class MyHashtableSC<K,V> {
             return false;
         }
 
-        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
+        HashEntry entry = data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -239,7 +239,7 @@ class MyHashtableSC<K,V> {
             return null;
         }
 
-        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
+        HashEntry entry = data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -264,7 +264,7 @@ class MyHashtableSC<K,V> {
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] != null) {
-                HashEntry entry = (HashEntry) data[i];
+                HashEntry entry = data[i];
                 newData[entry.getKey().hashCode() % newData.length] = entry;
             }
         }
@@ -287,7 +287,7 @@ class MyHashtableSC<K,V> {
             return null;
         }
 
-        HashEntry entry = (HashEntry) data[key.hashCode() % data.length];
+        HashEntry entry = data[key.hashCode() % data.length];
 
         if (key.equals(entry.getKey())) {
             V removedValue = entry.getValue();
@@ -327,7 +327,7 @@ class MyHashtableSC<K,V> {
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] instanceof Object) {
-                HashEntry entry = (HashEntry) data[i];
+                HashEntry entry = data[i];
                 while (entry != null) {
                     if (value.equals(entry.getValue())) {
                         return true;
@@ -346,7 +346,7 @@ class MyHashtableSC<K,V> {
     public void clear() {
         if (size > 0) {
             for (int i = 0; i < data.length; i++) {
-                if (data[i] instanceof Object) {
+                if (data[i] instanceof HashEntry) {
                     data[i] = null;
                 }
             }
