@@ -217,5 +217,12 @@ public class HashtableTester {
         assertEquals(true,test2.containsValue(6));
         assertEquals(6,test2.size);
     }
+    /** 
+    * Tests remove() of MyHashtableSC.
+    */
+    @Test
+    public void testRemove() {
+
+    }
 }
 
