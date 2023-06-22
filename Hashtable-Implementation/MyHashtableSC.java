@@ -103,7 +103,7 @@ class MyHashtableSC<K,V> {
     * Default contructor to create MyHashtableSC. 
     */
     public MyHashtableSC() {
-        data = (HashEntry[]) new Object[DEFAULT_CAPACITY];
+        data = (HashEntry[]) new MyHashtableSC.HashEntry[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -118,7 +118,7 @@ class MyHashtableSC<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry[]) new Object[initialCapacity];
+        data = (HashEntry[]) new MyHashtableSC.HashEntry[initialCapacity];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -136,7 +136,7 @@ class MyHashtableSC<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry[]) new Object[initialCapacity];
+        data = (HashEntry[]) new MyHashtableSC.HashEntry[initialCapacity];
         this.loadFactor = loadFactor;
         size = 0;
     }
