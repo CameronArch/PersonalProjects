@@ -190,12 +190,30 @@ class MyHashtableSC<K,V> {
         HashEntry<K,V>[] newData = (HashEntry<K,V>[]) new HashEntry[(data.length << 1) + 1];
 
         for (int i = 0; i < data.length; i++) {
-            if (data[i] != null) {
-                HashEntry<K,V> entry = data[i];
-                newData[entry.getKey().hashCode() % newData.length] = entry;
+            HashEntry<K,V> entry = data[i];
+            while (entry != null) {
+                if (newData[entry.getKey().hashCode() % newData.length] == null) {
+                    newData[entry.getKey().hashCode() % newData.length] = entry;
+                    
+                    HashEntry<K,V> temp = entry;
+                    entry = entry.getNext();
+                    temp.setNext(null);
+                }
+
+                else {
+                    HashEntry<K,V> setEntry = newData[entry.getKey().hashCode() % newData.length];
+                    while (setEntry.getNext() != null) {
+                        setEntry = setEntry.getNext();
+                    }
+
+                    setEntry.setNext(entry);
+                    HashEntry<K,V> temp = entry;
+                    entry = entry.getNext();
+                    temp.setNext(null);
+
+                }
             }
         }
-        
         data = newData;
     }
     /** 

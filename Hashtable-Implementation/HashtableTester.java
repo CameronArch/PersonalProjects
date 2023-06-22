@@ -42,6 +42,44 @@ public class HashtableTester {
     }
 
     @Test
+    public void testRehashSC() {
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
+        test.rehash();
+        assertEquals(23,test.data.length);
+        assertEquals(0,test.size());
+
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["one".hashCode() % 11].setNext(new HashEntry<>("ten", 10));
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
+		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+		test2.data[10] = new HashEntry<>("five", 15);
+        test2.size = 6;
+
+        test2.rehash();
+
+        assertEquals(23,test2.data.length);
+        assertEquals(6,test2.size());
+        assertEquals("one",test2.data["one".hashCode() % 23].getKey());
+        assertEquals(1,test2.data["one".hashCode() % 23].getValue().intValue());
+        assertEquals("two",test2.data["two".hashCode() % 23].getKey());
+        assertEquals(2,test2.data["two".hashCode() % 23].getValue().intValue());
+        assertEquals("ten",test2.data["ten".hashCode() % 23].getKey());
+        assertEquals(10,test2.data["ten".hashCode() % 23].getValue().intValue());
+		assertEquals("two",test2.data["eight".hashCode() % 23].getKey());
+        assertEquals(2,test2.data["eight".hashCode() % 23].getValue().intValue());
+		assertEquals("eight",test2.data["eight".hashCode() % 23].getNext().getKey());
+        assertEquals(8,test2.data["eight".hashCode() % 23].getNext().getValue().intValue());
+		assertEquals("five",test2.data["five".hashCode() % 23].getKey());
+        assertEquals(5,test2.data["five".hashCode() % 23].getValue().intValue());
+		assertEquals("five",test2.data["five".hashCode() % 23].getNext().getKey());
+        assertEquals(15,test2.data["five".hashCode() % 23].getNext().getValue().intValue());
+		
+		
+    }
+
+    @Test
     public void testPutSC() {
         MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
 
@@ -52,7 +90,31 @@ public class HashtableTester {
 
         assertEquals(null,test.put("one",1));
         assertEquals(1,test.size);
-        assertEquals(1,(HashEntry) test.data["one".hashCode() % 11].getValue());
+        assertEquals(1,test.data["one".hashCode() % 11].getValue().intValue());
+        assertEquals("one",test.data["one".hashCode() % 11].getKey());
+
+        assertEquals(1,test.put("one",2).intValue());
+        assertEquals(1,test.size);
+        assertEquals(2,test.data["one".hashCode() % 11].getValue().intValue());
+        assertEquals("one",test.data["one".hashCode() % 11].getKey());
+
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("ten",10);
+        test2.size = 1;
+
+        assertEquals(null,test2.put("one",1));
+        assertEquals(2,test2.size);
+        assertEquals(10,test2.data["one".hashCode() % 11].getValue().intValue());
+        assertEquals("ten",test2.data["one".hashCode() % 11].getKey());
+        assertEquals(1,test2.data["one".hashCode() % 11].getNext().getValue().intValue());
+        assertEquals("one",test2.data["one".hashCode() % 11].getNext().getKey());
+
+        assertEquals(1,test2.put("one",2).intValue());
+        assertEquals(2,test2.size);
+        assertEquals(2,test2.data["one".hashCode() % 11].getNext().getValue().intValue());
+        assertEquals("one",test2.data["one".hashCode() % 11].getNext().getKey());
+        assertEquals(10,test2.data["one".hashCode() % 11].getValue().intValue());
+        assertEquals("ten",test2.data["one".hashCode() % 11].getKey());
 
     }
 }
