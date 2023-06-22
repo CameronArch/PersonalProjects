@@ -25,7 +25,8 @@ public class HashtableTester {
         assertEquals(11,test.data.length);
         assertEquals(0.75,test.loadFactor,0.0000001);
 
-        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>(5);
+        MyHashtableSC<String,Integer> test2 = 
+                new MyHashtableSC<>(5);
 
         assertEquals(0,test2.size);
         assertEquals(5,test2.data.length);
@@ -33,7 +34,8 @@ public class HashtableTester {
         assertThrows(IllegalArgumentException.class,
                 () -> new MyHashtableSC<>(-1));
 
-        MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0,0.5);
+        MyHashtableSC<String,Integer> test3 = 
+                new MyHashtableSC<>(0,0.5);
 
         assertEquals(0,test3.size);
         assertEquals(0,test3.data.length);
@@ -57,7 +59,8 @@ public class HashtableTester {
         test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
         test2.data["one".hashCode() % 11].setNext(new HashEntry<>("ten", 10));
         test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
-		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["two".hashCode() % 11]
+                .setNext(new HashEntry<>("eight", 8));
 		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
 		test2.data[10] = new HashEntry<>("five", 15);
         test2.size = 6;
@@ -66,20 +69,34 @@ public class HashtableTester {
 
         assertEquals(23,test2.data.length);
         assertEquals(6,test2.size());
-        assertEquals("one",test2.data["one".hashCode() % 23].getKey());
-        assertEquals(1,test2.data["one".hashCode() % 23].getValue().intValue());
-        assertEquals("two",test2.data["two".hashCode() % 23].getKey());
-        assertEquals(2,test2.data["two".hashCode() % 23].getValue().intValue());
-        assertEquals("ten",test2.data["ten".hashCode() % 23].getKey());
-        assertEquals(10,test2.data["ten".hashCode() % 23].getValue().intValue());
-		assertEquals("two",test2.data["eight".hashCode() % 23].getKey());
-        assertEquals(2,test2.data["eight".hashCode() % 23].getValue().intValue());
-		assertEquals("eight",test2.data["eight".hashCode() % 23].getNext().getKey());
-        assertEquals(8,test2.data["eight".hashCode() % 23].getNext().getValue().intValue());
-		assertEquals("five",test2.data["five".hashCode() % 23].getKey());
-        assertEquals(5,test2.data["five".hashCode() % 23].getValue().intValue());
-		assertEquals("five",test2.data["five".hashCode() % 23].getNext().getKey());
-        assertEquals(15,test2.data["five".hashCode() % 23].getNext().getValue().intValue());	
+        assertEquals("one",test2.data["one".hashCode() % 23]
+                .getKey());
+        assertEquals(1,test2.data["one".hashCode() % 23]
+                .getValue().intValue());
+        assertEquals("two",test2.data["two".hashCode() % 23]
+                .getKey());
+        assertEquals(2,test2.data["two".hashCode() % 23]
+                .getValue().intValue());
+        assertEquals("ten",test2.data["ten".hashCode() % 23]
+                .getKey());
+        assertEquals(10,test2.data["ten".hashCode() % 23]
+                .getValue().intValue());
+		assertEquals("two",test2.data["eight".hashCode() % 23]
+                .getKey());
+        assertEquals(2,test2.data["eight".hashCode() % 23]
+                .getValue().intValue());
+		assertEquals("eight",test2.data["eight".hashCode() % 23]
+                .getNext().getKey());
+        assertEquals(8,test2.data["eight".hashCode() % 23]
+                .getNext().getValue().intValue());
+		assertEquals("five",test2.data["five".hashCode() % 23]
+                .getKey());
+        assertEquals(5,test2.data["five".hashCode() % 23]
+                .getValue().intValue());
+		assertEquals("five",test2.data["five".hashCode() % 23]
+                .getNext().getKey());
+        assertEquals(15,test2.data["five".hashCode() % 23]
+                .getNext().getValue().intValue());	
     }
     /** 
     * Tests put() of MyHashtableSC.
@@ -109,35 +126,46 @@ public class HashtableTester {
 
         assertEquals(null,test2.put("one",1));
         assertEquals(2,test2.size);
-        assertEquals(10,test2.data["one".hashCode() % 11].getValue().intValue());
-        assertEquals("ten",test2.data["one".hashCode() % 11].getKey());
-        assertEquals(1,test2.data["one".hashCode() % 11].getNext().getValue().intValue());
-        assertEquals("one",test2.data["one".hashCode() % 11].getNext().getKey());
+        assertEquals(10,test2.data["one".hashCode() % 11]
+                .getValue().intValue());
+        assertEquals("ten",test2.data["one".hashCode() % 11]
+                .getKey());
+        assertEquals(1,test2.data["one".hashCode() % 11]
+                .getNext().getValue().intValue());
+        assertEquals("one",test2.data["one".hashCode() % 11]
+                .getNext().getKey());
 
         assertEquals(1,test2.put("one",2).intValue());
         assertEquals(2,test2.size);
-        assertEquals(2,test2.data["one".hashCode() % 11].getNext().getValue().intValue());
-        assertEquals("one",test2.data["one".hashCode() % 11].getNext().getKey());
-        assertEquals(10,test2.data["one".hashCode() % 11].getValue().intValue());
+        assertEquals(2,test2.data["one".hashCode() % 11]
+                .getNext().getValue().intValue());
+        assertEquals("one",test2.data["one".hashCode() % 11]
+                .getNext().getKey());
+        assertEquals(10,test2.data["one".hashCode() % 11]
+                .getValue().intValue());
         assertEquals("ten",test2.data["one".hashCode() % 11].getKey());
 
-		MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(4,0.7);
+		MyHashtableSC<String,Integer> test3 = 
+                new MyHashtableSC<>(4,0.7);
 
 		assertEquals(null,test3.put("one",1));
 		assertEquals(1,test3.size);
-		assertEquals(1,test3.data["one".hashCode() % 4].getValue().intValue());
+		assertEquals(1,test3.data["one".hashCode() % 4]
+                .getValue().intValue());
         assertEquals("one",test3.data["one".hashCode() % 4].getKey());
 		assertEquals(4,test3.data.length);
 
 		assertEquals(null,test3.put("two",2));
 		assertEquals(2,test3.size);
-		assertEquals(2,test3.data["two".hashCode() % 4].getValue().intValue());
+		assertEquals(2,test3.data["two".hashCode() % 4]
+                .getValue().intValue());
         assertEquals("two",test3.data["two".hashCode() % 4].getKey());
 		assertEquals(4,test3.data.length);
 
 		assertEquals(null,test3.put("three",3));
 		assertEquals(3,test3.size);
-		assertEquals(3,test3.data["three".hashCode() % 9].getValue().intValue());
+		assertEquals(3,test3.data["three".hashCode() % 9]
+                .getValue().intValue());
         assertEquals("three",test3.data["three".hashCode() % 9].getKey());
 		assertEquals(9,test3.data.length);
     }
@@ -149,7 +177,8 @@ public class HashtableTester {
         MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
         test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
         test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
-		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["two".hashCode() % 11]
+                .setNext(new HashEntry<>("eight", 8));
 		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
         test2.data[10] = new HashEntry<>("nine", 5);
         test2.size = 6;
@@ -171,7 +200,8 @@ public class HashtableTester {
         MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
         test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
         test2.data["two".hashCode() % 11] = new HashEntry<>("two", 1);
-		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["two".hashCode() % 11]
+                .setNext(new HashEntry<>("eight", 8));
 		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
         test2.data[10] = new HashEntry<>("nine", 6);
         test2.size = 6;

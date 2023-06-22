@@ -187,12 +187,14 @@ class MyHashtableSC<K,V> {
     * entries into larger array.
     */
     public void rehash() {
-        HashEntry<K,V>[] newData = (HashEntry<K,V>[]) new HashEntry[(data.length << 1) + 1];
+        HashEntry<K,V>[] newData = (HashEntry<K,V>[]) 
+                new HashEntry[(data.length << 1) + 1];
 
         for (int i = 0; i < data.length; i++) {
             HashEntry<K,V> entry = data[i];
             while (entry != null) {
-                if (newData[entry.getKey().hashCode() % newData.length] == null) {
+                if (newData[entry.getKey().hashCode() % newData.length] 
+                        == null) {
                     newData[entry.getKey().hashCode() % newData.length] = entry;
                     
                     HashEntry<K,V> temp = entry;
@@ -201,7 +203,8 @@ class MyHashtableSC<K,V> {
                 }
 
                 else {
-                    HashEntry<K,V> setEntry = newData[entry.getKey().hashCode() % newData.length];
+                    HashEntry<K,V> setEntry = 
+                            newData[entry.getKey().hashCode() % newData.length];
                     while (setEntry.getNext() != null) {
                         setEntry = setEntry.getNext();
                     }
