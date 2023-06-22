@@ -187,7 +187,7 @@ class MyHashtableSC<K,V> {
     * entries into larger array.
     */
     public void rehash() {
-        Object[] newData = new Object[(data.length << 1) + 1];
+        HashEntry<K,V>[] newData = (HashEntry<K,V>[]) new HashEntry[(data.length << 1) + 1];
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] != null) {
@@ -195,6 +195,8 @@ class MyHashtableSC<K,V> {
                 newData[entry.getKey().hashCode() % newData.length] = entry;
             }
         }
+        
+        data = newData;
     }
     /** 
     * Method to remove an entry from the Hashtable. The argument cannot be null.

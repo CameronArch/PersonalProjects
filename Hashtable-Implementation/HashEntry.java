@@ -8,15 +8,15 @@
 */
 
 /** 
-    * A HashEntry class for implementing an entry in a Hashtable and
-    * associated methods for an entry. 
-    * 
-    * 
-    * Instance variables:
-    * key - Reference to the key of entry.
-    * value - Reference to the value of entry.
-    * next - Reference to next entry in Linked List for separate chaining.
-    */
+* A HashEntry class for implementing an entry in a Hashtable and
+* associated methods for an entry. 
+* 
+* 
+* Instance variables:
+* key - Reference to the key of entry.
+* value - Reference to the value of entry.
+* next - Reference to next entry in Linked List for separate chaining.
+*/
 public class HashEntry<K,V> {
         
     private K key;
