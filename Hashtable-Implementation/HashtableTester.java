@@ -116,6 +116,25 @@ public class HashtableTester {
         assertEquals(10,test2.data["one".hashCode() % 11].getValue().intValue());
         assertEquals("ten",test2.data["one".hashCode() % 11].getKey());
 
+		MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(4,0.7);
+
+		assertEquals(null,test3.put("one",1));
+		assertEquals(1,test3.size);
+		assertEquals(1,test3.data["one".hashCode() % 4].getValue().intValue());
+        assertEquals("one",test3.data["one".hashCode() % 4].getKey());
+		assertEquals(4,test3.data.length);
+
+		assertEquals(null,test3.put("two",2));
+		assertEquals(2,test3.size);
+		assertEquals(2,test3.data["two".hashCode() % 4].getValue().intValue());
+        assertEquals("two",test3.data["two".hashCode() % 4].getKey());
+		assertEquals(4,test3.data.length);
+
+		assertEquals(null,test3.put("three",3));
+		assertEquals(3,test3.size);
+		assertEquals(3,test3.data["three".hashCode() % 9].getValue().intValue());
+        assertEquals("three",test3.data["three".hashCode() % 9].getKey());
+		assertEquals(9,test3.data.length);
     }
 }
 
