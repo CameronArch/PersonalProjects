@@ -3,9 +3,8 @@
   Email: cameronarch598@gmail.com
   Sources Used: Java Interface Documentation
 
-  This file holds the implementation for an entry node in a Hashtable,
-  a Hashtable with separate chaining, and the 
-  methods associated to them.
+  This file holds the implementation a Hashtable with separate chaining, 
+  and the methods associated to them.
 */
 
 /** 
@@ -20,7 +19,7 @@
 */
 class MyHashtableSC<K,V> {
     
-    HashEntry[] data;
+    HashEntry<K,V>[] data;
     int size;
     double loadFactor;
     
@@ -28,82 +27,10 @@ class MyHashtableSC<K,V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     /** 
-    * A HashEntry class for implementing an entry in MyHashtable and
-    * associated methods for an entry. 
-    * 
-    * 
-    * Instance variables:
-    * key - Reference to the key of entry.
-    * value - Reference to the value of entry.
-    * next - Reference to next entry in Linked List for separate chaining.
-    */
-    protected class HashEntry {
-        
-        private K key;
-        private V value;
-        private HashEntry next;
-        
-        /** 
-         * Contructor to create a HashEntry.
-         * 
-         * @param key the key for this HashEntry
-         * @param value the value for this HashEntry
-         */
-        public HashEntry(K key, V value) {
-            this.key = key;
-            this.value = value;
-            this.next = null;
-        }
-        /** 
-         * Method to get the key of this HashEntry. 
-         * 
-         * @return the key
-         */
-        public K getKey() {
-            return key;
-        }
-        /** 
-         * Method to get the value of this HashEntry. 
-         * 
-         * @return the value
-         */
-        public V getValue() {
-            return value;
-        }
-        /** 
-         * Method to set a new value for this HashEntry.
-         * 
-         * @param value the new value to replace previous value 
-         */
-        public void setValue(V value) {
-            this.value = value;
-        }
-        /** 
-         * Method to get the entry after this HashEntry
-         * if there is separate chaining. Returns null if 
-         * there is no next entry.
-         * 
-         * @return the next entry or null
-         */
-        public HashEntry getNext() {
-            return next;
-        }
-        /** 
-         * Method to set next reference for this HashEntry
-         * to given HashEntry. 
-         * 
-         * @param entry HashEntry to be referenced by next
-         */
-        public void setNext(HashEntry entry) {
-            next = entry;
-        }
-    }
-    
-    /** 
     * Default contructor to create MyHashtableSC. 
     */
     public MyHashtableSC() {
-        data = (HashEntry[]) new MyHashtableSC.HashEntry[DEFAULT_CAPACITY];
+        data = (HashEntry<K,V>[]) new HashEntry[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -118,7 +45,7 @@ class MyHashtableSC<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry[]) new MyHashtableSC.HashEntry[initialCapacity];
+        data = (HashEntry<K,V>[]) new HashEntry[initialCapacity];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -136,7 +63,7 @@ class MyHashtableSC<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry[]) new MyHashtableSC.HashEntry[initialCapacity];
+        data = (HashEntry<K,V>[]) new HashEntry[initialCapacity];
         this.loadFactor = loadFactor;
         size = 0;
     }
@@ -174,7 +101,7 @@ class MyHashtableSC<K,V> {
             return null;
         }
 
-        HashEntry entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -204,7 +131,7 @@ class MyHashtableSC<K,V> {
             return false;
         }
 
-        HashEntry entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -234,12 +161,12 @@ class MyHashtableSC<K,V> {
         }
 
         if (data[key.hashCode() % data.length] == null) {
-            data[key.hashCode() % data.length] = new HashEntry(key, value);
+            data[key.hashCode() % data.length] = new HashEntry<>(key, value);
             size++;
             return null;
         }
 
-        HashEntry entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[key.hashCode() % data.length];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -251,7 +178,7 @@ class MyHashtableSC<K,V> {
             return replacedValue;
         }
 
-        entry.setNext(new HashEntry(key,value)); 
+        entry.setNext(new HashEntry<>(key,value)); 
         size++;
         return null;
     }
@@ -259,12 +186,12 @@ class MyHashtableSC<K,V> {
     * Method to expand the capacity of the Hashtable and rehash
     * entries into larger array.
     */
-    protected void rehash() {
+    public void rehash() {
         Object[] newData = new Object[(data.length << 1) + 1];
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] != null) {
-                HashEntry entry = data[i];
+                HashEntry<K,V> entry = data[i];
                 newData[entry.getKey().hashCode() % newData.length] = entry;
             }
         }
@@ -287,7 +214,7 @@ class MyHashtableSC<K,V> {
             return null;
         }
 
-        HashEntry entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[key.hashCode() % data.length];
 
         if (key.equals(entry.getKey())) {
             V removedValue = entry.getValue();
@@ -327,7 +254,7 @@ class MyHashtableSC<K,V> {
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] instanceof Object) {
-                HashEntry entry = data[i];
+                HashEntry<K,V> entry = data[i];
                 while (entry != null) {
                     if (value.equals(entry.getValue())) {
                         return true;
