@@ -14,6 +14,9 @@ import static org.junit.Assert.*;
 */
 public class HashtableTester {
 
+    /** 
+    * Tests contructors of MyHashtableSC.
+    */
     @Test
     public void testContructorSC() {
         MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
@@ -40,7 +43,9 @@ public class HashtableTester {
         assertThrows(IllegalArgumentException.class,
                 () -> new MyHashtableSC<>(-1,1));
     }
-
+    /** 
+    * Tests rehash() of MyHashtableSC.
+    */
     @Test
     public void testRehashSC() {
         MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
@@ -74,11 +79,11 @@ public class HashtableTester {
 		assertEquals("five",test2.data["five".hashCode() % 23].getKey());
         assertEquals(5,test2.data["five".hashCode() % 23].getValue().intValue());
 		assertEquals("five",test2.data["five".hashCode() % 23].getNext().getKey());
-        assertEquals(15,test2.data["five".hashCode() % 23].getNext().getValue().intValue());
-		
-		
+        assertEquals(15,test2.data["five".hashCode() % 23].getNext().getValue().intValue());	
     }
-
+    /** 
+    * Tests put() of MyHashtableSC.
+    */
     @Test
     public void testPutSC() {
         MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
@@ -135,6 +140,52 @@ public class HashtableTester {
 		assertEquals(3,test3.data["three".hashCode() % 9].getValue().intValue());
         assertEquals("three",test3.data["three".hashCode() % 9].getKey());
 		assertEquals(9,test3.data.length);
+    }
+    /** 
+    * Tests containsKey() of MyHashtableSC.
+    */
+    @Test
+    public void testContainsKey() {
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
+		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+        test2.data[10] = new HashEntry<>("nine", 5);
+        test2.size = 6;
+
+        assertThrows(NullPointerException.class,
+                () -> test2.containsKey(null));
+        assertEquals(true,test2.containsKey("two"));
+        assertEquals(true,test2.containsKey("one"));
+        assertEquals(true,test2.containsKey("eight"));
+        assertEquals(false,test2.containsKey("ten"));
+        assertEquals(false,test2.containsKey("nine"));
+        assertEquals(6,test2.size);
+    }
+    /** 
+    * Tests containsValue() of MyHashtableSC.
+    */
+    @Test
+    public void testContainsValue() {
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 1);
+		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+        test2.data[10] = new HashEntry<>("nine", 6);
+        test2.size = 6;
+
+        assertThrows(NullPointerException.class,
+                () -> test2.containsValue(null));
+        assertEquals(true,test2.containsValue(1));
+        assertEquals(false,test2.containsValue(2));
+        assertEquals(true,test2.containsValue(8));
+        assertEquals(false,test2.containsValue(10));
+        assertEquals(false,test2.containsValue(12));
+        assertEquals(true,test2.containsValue(5));
+        assertEquals(true,test2.containsValue(6));
+        assertEquals(6,test2.size);
     }
 }
 
