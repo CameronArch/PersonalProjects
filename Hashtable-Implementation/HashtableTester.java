@@ -174,7 +174,6 @@ public class HashtableTester {
         assertEquals(null,test4.put("1",1));
         assertEquals(1,test4.size);
         assertEquals(1,test4.data.length);
-
     }
     /** 
     * Tests containsKey() of MyHashtableSC.
@@ -229,7 +228,6 @@ public class HashtableTester {
 
         MyHashtableSC<String,Integer> test = new MyHashtableSC<>(0);
         assertEquals(false,test.containsValue(2));
-        
     }
     /** 
     * Tests remove() of MyHashtableSC.
@@ -271,8 +269,6 @@ public class HashtableTester {
         assertEquals(null, 
                 test2.data["two".hashCode() % 11].getNext());
         assertEquals(null,test2.remove("eight"));
-
-        
     }
 }
 
