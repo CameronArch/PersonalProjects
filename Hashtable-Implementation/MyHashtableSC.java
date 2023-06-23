@@ -126,7 +126,9 @@ class MyHashtableSC<K,V> {
         if (key == null) {
             throw new NullPointerException();
         }
-        
+        if (data.length == 0) {
+            return false;
+        }
         if (data[key.hashCode() % data.length] == null) {
             return false;
         }
@@ -232,7 +234,9 @@ class MyHashtableSC<K,V> {
         if (key == null) {
             throw new NullPointerException();
         }
-
+        if (data.length == 0) {
+            return null;
+        }
         if (data[key.hashCode() % data.length] == null) {
             return null;
         }
@@ -251,7 +255,7 @@ class MyHashtableSC<K,V> {
             entry = entry.getNext();
         }
 
-        if (key.equals(entry.getNext().getKey())) {
+        if (entry.getNext() != null) {
             V removedValue = entry.getNext().getValue();
             entry.setNext(entry.getNext().getNext());
             size--;

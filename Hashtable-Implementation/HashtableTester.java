@@ -168,12 +168,19 @@ public class HashtableTester {
                 .getValue().intValue());
         assertEquals("three",test3.data["three".hashCode() % 9].getKey());
 		assertEquals(9,test3.data.length);
+
+        MyHashtableSC<String,Integer> test4 = new MyHashtableSC<>(0);
+        assertEquals(0,test4.data.length);
+        assertEquals(null,test4.put("1",1));
+        assertEquals(1,test4.size);
+        assertEquals(1,test4.data.length);
+
     }
     /** 
     * Tests containsKey() of MyHashtableSC.
     */
     @Test
-    public void testContainsKey() {
+    public void testContainsKeySC() {
         MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
         test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
         test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
@@ -191,12 +198,15 @@ public class HashtableTester {
         assertEquals(false,test2.containsKey("ten"));
         assertEquals(false,test2.containsKey("nine"));
         assertEquals(6,test2.size);
+
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>(0);
+        assertEquals(false,test.containsKey("1"));
     }
     /** 
     * Tests containsValue() of MyHashtableSC.
     */
     @Test
-    public void testContainsValue() {
+    public void testContainsValueSC() {
         MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
         test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
         test2.data["two".hashCode() % 11] = new HashEntry<>("two", 1);
@@ -216,13 +226,53 @@ public class HashtableTester {
         assertEquals(true,test2.containsValue(5));
         assertEquals(true,test2.containsValue(6));
         assertEquals(6,test2.size);
+
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>(0);
+        assertEquals(false,test.containsValue(2));
+        
     }
     /** 
     * Tests remove() of MyHashtableSC.
     */
     @Test
-    public void testRemove() {
+    public void testRemoveSC() {
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
 
+        MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0);
+
+        assertThrows(NullPointerException.class,
+                () -> test.remove(null));
+
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
+		test2.data["two".hashCode() % 11]
+                .setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+        test2.data[10] = new HashEntry<>("nine", 5);
+        test2.size = 6;
+
+        assertEquals(null, test.remove("null"));
+        assertEquals(null, test3.remove("null"));
+        assertEquals(0, test3.size);
+        assertEquals(0, test.size);
+
+        assertEquals(1, test2.remove("one").intValue());
+        assertEquals(5, test2.size);
+        assertEquals(null, test2.data["one".hashCode() % 11]);
+        assertEquals(null,test2.remove("nine"));
+        assertEquals(5, test2.size);
+        assertEquals(8,test2.remove("eight").intValue());
+        assertEquals(4, test2.size);
+        assertEquals("two", 
+                test2.data["two".hashCode() % 11].getKey());
+        assertEquals(2, 
+                test2.data["two".hashCode() % 11].getValue().intValue());
+        assertEquals(null, 
+                test2.data["two".hashCode() % 11].getNext());
+        assertEquals(null,test2.remove("eight"));
+
+        
     }
 }
 
