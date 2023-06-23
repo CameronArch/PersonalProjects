@@ -270,5 +270,36 @@ public class HashtableTester {
                 test2.data["two".hashCode() % 11].getNext());
         assertEquals(null,test2.remove("eight"));
     }
-}
+    /** 
+    * Tests clear() of MyHashtableSC.
+    */
+    @Test
+    public void testClearSC() {
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
+		test2.data["two".hashCode() % 11]
+                .setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+        test2.data[10] = new HashEntry<>("nine", 5);
+        test2.size = 6;
 
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
+
+        MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0);
+
+        test.clear();
+        assertEquals(0,test.size);
+
+        test3.clear();
+        assertEquals(0,test3.size);
+        assertEquals(0,test3.data.length);
+
+        test2.clear();
+        assertEquals(0,test2.size);
+        assertEquals(11,test2.data.length);
+        for (int i = 0; i < test2.data.length; i++) {
+            assertEquals(null,test2.data[i]);
+        }
+    }
+}
