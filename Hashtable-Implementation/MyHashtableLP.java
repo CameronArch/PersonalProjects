@@ -3,13 +3,13 @@
   Email: cameronarch598@gmail.com
   Sources Used: Java Interface Documentation
 
-  This file holds the implementation a Hashtable with separate chaining, 
+  This file holds the implementation a Hashtable with linear probing, 
   and the methods associated to them.
 */
 
 /** 
- * A MyHashtableSC class for implementing a Hashtable with 
- * separate chaining and associated methods for a Hashtable. 
+ * A MyHashtableLP class for implementing a Hashtable with 
+ * linear probing and associated methods for a Hashtable. 
  * 
  * 
  * Instance variables:
@@ -17,7 +17,7 @@
  * size - Reference to amount of elements in Hashtable.
  * loadFactor - Reference to maximum load factor for Hashtable before resize.
 */
-class MyHashtableSC<K,V> {
+class MyHashtableLP<K,V> {
     
     HashEntry<K,V>[] data;
     int size;
@@ -27,20 +27,20 @@ class MyHashtableSC<K,V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     /** 
-    * Default contructor to create MyHashtableSC. 
+    * Default contructor to create MyHashtableLP. 
     */
-    public MyHashtableSC() {
+    public MyHashtableLP() {
         data = (HashEntry<K,V>[]) new HashEntry[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
     /** 
-    * Contructor to create MyHashtableSC with a specified
+    * Contructor to create MyHashtableLP with a specified
     * initial capacity. The inital capacity cannot be less than 0.
     * 
-    * @param initialCapacity the initial capacity for this MyHashtableSC
+    * @param initialCapacity the initial capacity for this MyHashtableLP
     */
-    public MyHashtableSC(int initialCapacity) {
+    public MyHashtableLP(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException();
         }
@@ -50,15 +50,15 @@ class MyHashtableSC<K,V> {
         size = 0;
     }
     /** 
-    * Contructor to create MyHashtableSC with a specified
+    * Contructor to create MyHashtableLP with a specified
     * initial capacity and maximum load factor. The inital capacity 
     * cannot be less than 0 and the load factor cannot be less than
     * or equal to zero.
     * 
-    * @param initialCapacity the initial capacity for this MyHashtableSC
-    * @param loadFactor the maximum load factor for this MyHashtableSC
+    * @param initialCapacity the initial capacity for this MyHashtableLP
+    * @param loadFactor the maximum load factor for this MyHashtableLP
     */
-    public MyHashtableSC(int initialCapacity, double loadFactor) {
+    public MyHashtableLP(int initialCapacity, double loadFactor) {
         if (initialCapacity < 0 || loadFactor <= 0) {
             throw new IllegalArgumentException();
         }
