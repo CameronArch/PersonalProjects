@@ -8,6 +8,8 @@
 */
 
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 /** 
  * A MyHashtableLP class for implementing a Hashtable with 
@@ -19,9 +21,9 @@ import java.util.Dictionary;
  * size - Reference to amount of elements in Hashtable.
  * loadFactor - Reference to maximum load factor for Hashtable before resize.
 */
-class MyHashtableLP<K,V> extends Dictionary<K,V>{
+class MyHashtableLP<K,V> extends Dictionary<K,V> {
     
-    HashEntry<K,V>[] data;
+    HashEntry[] data;
     int size;
     double loadFactor;
     
@@ -29,45 +31,206 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     /** 
-    * Default contructor to create MyHashtableLP. 
+    * A HashEntry class for implementing an entry in a Hashtable and
+    * associated methods for an entry. 
+    * 
+    * 
+    * Instance variables:
+    * key - Reference to the key of entry.
+    * value - Reference to the value of entry.
+    * removed - Reference to if entry has been removed.
+    */
+    protected class HashEntry {
+        
+        private K key;
+        private V value;
+        private boolean removed;
+        
+        /** 
+        * Contructor to create a HashEntry.
+        * 
+        * @param key the key for this HashEntry
+        * @param value the value for this HashEntry
+        */
+        public HashEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+            this.removed = false;
+        }
+        /** 
+        * Method to get the key of this HashEntry. 
+        * 
+        * @return the key
+        */
+        public K getKey() {
+            return key;
+        }
+        /** 
+        * Method to set a new key for this HashEntry.
+        * 
+        * @param value the new key to replace previous key 
+        */
+        public void setKey(K key) {
+            this.key = key;
+        }
+        /** 
+        * Method to get the value of this HashEntry. 
+        * 
+        * @return the value
+        */
+        public V getValue() {
+            return value;
+        }
+        /** 
+        * Method to set a new value for this HashEntry.
+        * 
+        * @param value the new value to replace previous value 
+        */
+        public void setValue(V value) {
+            this.value = value;
+        }
+        /** 
+        * Method to see if this HashEntry is removed. 
+        * 
+        * @return the state of the entry
+        */
+        public boolean getState() {
+            return removed;
+        }
+        /** 
+        * Method to set this HashEntry as removed or not.
+        * 
+        * @param removed the new state of this HashEntry 
+        */
+        public void setState(boolean removed) {
+            this.removed = removed;
+        }
+    }
+    /** 
+    * A HashtableEnumerator class for implementing an enumeration of
+    * the keys and values in a Hashtable. 
+    * 
+    * 
+    * Instance variables:
+    * data - Reference to Hashtable data.
+    * nextEntry - Reference to the next entry in Hashtable.
+    * index - Reference to the index in data where nextEntry is located.
+    * keys - Determines whether to create an enumeration of keys or values.
+    */
+    private class HashtableEnumerator<T> implements Enumeration<T> {
+
+        private HashEntry[] data;
+        private HashEntry nextEntry;
+        private int index;
+        private boolean keys;
+
+        /** 
+        * Contructor to create a HashtableEnumerator.
+        * 
+        * @param data the underlying array for Hashtable
+        * @param keys boolean value to determine if enumerator
+        * will be for the keys or values
+        */
+        public HashtableEnumerator(HashEntry[] data, boolean keys) {
+            this.data = data;
+            this.keys = keys;
+            for (int i = 0; i < data.length; i++) {
+                if (data[i] != null && !data[i].getState()) {
+                    this.nextEntry = data[i];
+                    this.index = i;
+                    break;
+                }
+                this.nextEntry = null;
+                this.index = i;
+            } 
+        }
+        /** 
+        * Method to determine if there are more elements in HashtableEnumerator.
+        * 
+        * @return true if there are more elements, false otherwise
+        */
+        public boolean hasMoreElements() {
+            return nextEntry != null;
+        }
+        /** 
+        * Method to get element in HashtableEnumerator.
+        * 
+        * @return the next element or throws NoSuchElementException if there 
+        * are no more elements
+        */
+        public T nextElement() {
+            if (hasMoreElements()) {
+                HashEntry currEntry = nextEntry;
+                if (index == data.length - 1) {
+                    nextEntry = null;
+                }
+                else {
+                    for (int i = index + 1; i < data.length; i++) {
+                        index = i;
+                        if (data[i] != null && !data[i].getState()) {
+                            nextEntry = data[i];
+                            break;
+                        }
+                        nextEntry = null;
+                    }
+                }
+                return keys ? (T) currEntry.getKey() : (T) currEntry.getValue();
+            }
+            throw new NoSuchElementException();
+        }
+        
+    }
+    /** 
+    * Default contructor to create MyHashtableSC. 
     */
     public MyHashtableLP() {
-        data = (HashEntry<K,V>[]) new HashEntry[DEFAULT_CAPACITY];
+        data = (HashEntry[]) new MyHashtableLP.HashEntry[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
     /** 
-    * Contructor to create MyHashtableLP with a specified
+    * Contructor to create MyHashtableSC with a specified
     * initial capacity. The inital capacity cannot be less than 0.
     * 
-    * @param initialCapacity the initial capacity for this MyHashtableLP
+    * @param initialCapacity the initial capacity for this MyHashtableSC
     */
     public MyHashtableLP(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry<K,V>[]) new HashEntry[initialCapacity];
+        data = (HashEntry[]) new MyHashtableLP.HashEntry[initialCapacity];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
     /** 
-    * Contructor to create MyHashtableLP with a specified
+    * Contructor to create MyHashtableSC with a specified
     * initial capacity and maximum load factor. The inital capacity 
     * cannot be less than 0 and the load factor cannot be less than
     * or equal to zero.
     * 
-    * @param initialCapacity the initial capacity for this MyHashtableLP
-    * @param loadFactor the maximum load factor for this MyHashtableLP
+    * @param initialCapacity the initial capacity for this MyHashtableSC
+    * @param loadFactor the maximum load factor for this MyHashtableSC
     */
     public MyHashtableLP(int initialCapacity, double loadFactor) {
-        if (initialCapacity < 0 || loadFactor <= 0) {
+        if (initialCapacity < 0 || loadFactor <= 0.0 || loadFactor > 1.0) {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry<K,V>[]) new HashEntry[initialCapacity];
+        data = (HashEntry[]) new MyHashtableLP.HashEntry[initialCapacity];
         this.loadFactor = loadFactor;
         size = 0;
+    }
+    /**
+    * Method to create a HashEntry object.
+    * 
+    * @param key the key for the entry
+    * @param value the value for the entry
+    * 
+    * @return a HashEntry object
+    */
+    public HashEntry entry(K key, V value) {
+        return new HashEntry(key, value);
     }
     /** 
     * Method to get size of Hashtable.
@@ -111,16 +274,18 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
             return null;
         }
 
-        HashEntry<K,V> entry = data[hash];
-
-        while (entry.getNext() != null && !key.equals(entry.getKey())) {
-            entry = entry.getNext();
+        HashEntry entry = data[hash];
+        int index = hash;
+        int count = 0;
+        while (count < data.length && entry != null) {
+            if (key.equals(entry.getKey()) && !entry.getState()) {
+                return entry.getValue();
+            }
+            index = (index + 1) % data.length;
+            entry = data[index];
+            count++;
         }
-
-        if (key.equals(entry.getKey())) {
-            return entry.getValue();
-        }
-
+        
         return null;
     }
     /** 
@@ -149,13 +314,20 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
             return false;
         }
 
-        HashEntry<K,V> entry = data[hash];
-
-        while (entry.getNext() != null && !key.equals(entry.getKey())) {
-            entry = entry.getNext();
+        HashEntry entry = data[hash];
+        int index = hash;
+        int count = 0;
+        while (count < data.length && entry != null) {
+            if (key.equals(entry.getKey()) && !entry.getState()) {
+                return true;
+            }
+            
+            index = (index + 1) % data.length;
+            entry = data[index];
+            count++;
         }
-
-        return key.equals(entry.getKey());
+        
+        return false;
     }
     /** 
     * Method to add an entry to the Hashtable. The arguments cannot be null.
@@ -184,24 +356,42 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
         }
 
         if (data[hash] == null) {
-            data[hash] = new HashEntry<>(key, value);
+            data[hash] = new HashEntry(key,value);
             size++;
             return null;
         }
 
-        HashEntry<K,V> entry = data[hash];
-
-        while (entry.getNext() != null && !key.equals(entry.getKey())) {
-            entry = entry.getNext();
+        HashEntry entry = data[hash];
+        int index = hash;
+        int count = 0;
+        while (count < data.length && entry != null) {
+            if (key.equals(entry.getKey()) && !entry.getState()) {
+                V replacedValue = entry.getValue();
+                entry.setValue(value);
+                return replacedValue;
+            }
+            index = (index + 1) % data.length;
+            entry = data[index];
+            count++;
         }
 
-        if (key.equals(entry.getKey())) {
-            V replacedValue = entry.getValue();
-            entry.setValue(value);
-            return replacedValue;
+        for (int i = hash; i < data.length + hash; i++) {
+            if (i >= data.length) {
+                i = i % data.length;
+            }
+            if (data[i] == null) {
+                break;
+            }
+            if (data[i].getState()) {
+                data[i].setKey(key);
+                data[i].setValue(value);
+                data[i].setState(false);
+                size++;
+                return null;
+            }
         }
-
-        entry.setNext(new HashEntry<>(key,value)); 
+        
+        data[index] = new HashEntry(key,value);
         size++;
         return null;
     }
@@ -210,38 +400,29 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
     * entries into larger array.
     */
     public void rehash() {
-        HashEntry<K,V>[] newData = (HashEntry<K,V>[]) 
-                new HashEntry[(data.length << 1) + 1];
-
-        for (int i = 0; i < data.length; i++) {
-            HashEntry<K,V> entry = data[i];
-            while (entry != null) {
-                int hash = entry.getKey().hashCode() % newData.length;
+        HashEntry[] newData = (HashEntry[]) 
+                new MyHashtableLP.HashEntry[(data.length << 1) + 1];
+        for (HashEntry s: data) {
+            if (s != null && !s.getState()){
+                int hash = s.getKey().hashCode() % newData.length;
                 if (hash < 0) {
-                    hash += data.length;
+                    hash += newData.length;
                 }
 
-                if (newData[hash] 
-                        == null) {
-                    newData[hash] = entry;
-                    
-                    HashEntry<K,V> temp = entry;
-                    entry = entry.getNext();
-                    temp.setNext(null);
+                if (newData[hash] == null) {
+                    newData[hash] = s;
                 }
 
                 else {
-                    HashEntry<K,V> setEntry = 
-                            newData[hash];
-                    while (setEntry.getNext() != null) {
-                        setEntry = setEntry.getNext();
+                    for (int i = hash + 1; i < newData.length + hash; i++) {
+                        if (i >= newData.length) {
+                            i = i % newData.length;
+                        }
+                        if (newData[i] == null) {
+                            newData[i] = s;
+                            break;
+                        }
                     }
-
-                    setEntry.setNext(entry);
-                    HashEntry<K,V> temp = entry;
-                    entry = entry.getNext();
-                    temp.setNext(null);
-
                 }
             }
         }
@@ -273,27 +454,21 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
             return null;
         }
 
-        HashEntry<K,V> entry = data[hash];
-
-        if (key.equals(entry.getKey())) {
-            V removedValue = entry.getValue();
-            data[hash] = entry.getNext();
-            size--;
-            return removedValue;
+        HashEntry entry = data[hash];
+        int index = hash;
+        int count = 0;
+        while (count < data.length && entry != null) {
+            if (key.equals(entry.getKey()) && !entry.getState()) {
+                V removedValue = entry.getValue();
+                entry.setState(true);
+                size--;
+                return removedValue;
+            }
+            index = (index + 1) % data.length;
+            entry = data[index];
+            count++;
         }
-
-        while (entry.getNext() != null && 
-                !key.equals(entry.getNext().getKey())) {
-            entry = entry.getNext();
-        }
-
-        if (entry.getNext() != null) {
-            V removedValue = entry.getNext().getValue();
-            entry.setNext(entry.getNext().getNext());
-            size--;
-            return removedValue;
-        }
-
+        
         return null;
     }
     /** 
@@ -313,17 +488,11 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] instanceof Object) {
-                HashEntry<K,V> entry = data[i];
-                while (entry != null) {
-                    if (value.equals(entry.getValue())) {
-                        return true;
-                    }
-
-                    entry = entry.getNext();
-                }
+                if (value.equals(data[i].getValue())) {
+                    return true;
+                }   
             }
         }
-
         return false;
     }
     /** 
@@ -332,11 +501,27 @@ class MyHashtableLP<K,V> extends Dictionary<K,V>{
     public void clear() {
         if (size > 0) {
             for (int i = 0; i < data.length; i++) {
-                if (data[i] instanceof HashEntry) {
+                if (data[i] instanceof Object) {
                     data[i] = null;
                 }
             }
             size = 0;
         }
+    }
+    /** 
+    * Method to get an enumeration of the keys in Hashtable.
+    *
+    * @return an enumeration of the keys
+    */
+    public Enumeration<K> keys() {
+        return (Enumeration<K>) new HashtableEnumerator(data,true);
+    }
+    /** 
+    * Method to get an enumeration of the values in Hashtable.
+    *
+    * @return an enumeration of the values
+    */
+    public Enumeration<V> elements() {
+        return (Enumeration<V>) new HashtableEnumerator(data,false);
     }
 }

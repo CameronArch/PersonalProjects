@@ -148,12 +148,13 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
                 }
                 else {
                     for (int i = index + 1; i < data.length; i++) {
+                        index = i;
                         if (data[i] instanceof Object) {
                             nextEntry = data[i].get(0);
-                            index = i;
                             list = data[i].listIterator(1);
                             break;
                         }
+                        nextEntry = null;
                     }
                 }
                 return keys ? (T) currEntry.getKey() : (T) currEntry.getValue();
@@ -194,7 +195,7 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
     * @param loadFactor the maximum load factor for this MyHashtableSC
     */
     public MyHashtableSC(int initialCapacity, double loadFactor) {
-        if (initialCapacity < 0 || loadFactor <= 0) {
+        if (initialCapacity < 0 || loadFactor <= 0.0) {
             throw new IllegalArgumentException();
         }
         
@@ -203,13 +204,13 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
         size = 0;
     }
     /**
-     * Method to create a HashEntry object.
-     * 
-     * @param key the key for the entry
-     * @param value the value for the entry
-     * 
-     * @return a HashEntry object
-     */
+    * Method to create a HashEntry object.
+    * 
+    * @param key the key for the entry
+    * @param value the value for the entry
+    * 
+    * @return a HashEntry object
+    */
     public HashEntry entry(K key, V value) {
         return new HashEntry(key, value);
     }
@@ -367,7 +368,7 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
                     HashEntry entry = list.next();
                     int hash = entry.getKey().hashCode() % newData.length;
                     if (hash < 0) {
-                        hash += data.length;
+                        hash += newData.length;
                     }
 
                     if (newData[hash] == null) {
