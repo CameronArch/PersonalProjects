@@ -9,6 +9,9 @@
 
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /** 
  * A MyHashtableSC class for implementing a Hashtable with 
@@ -22,7 +25,7 @@ import java.util.Enumeration;
 */
 class MyHashtableSC<K,V> extends Dictionary<K,V> {
     
-    HashEntry<K,V>[] data;
+    LinkedList<HashEntry>[] data;
     int size;
     double loadFactor;
     
@@ -30,10 +33,139 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     /** 
+    * A HashEntry class for implementing an entry in a Hashtable and
+    * associated methods for an entry. 
+    * 
+    * 
+    * Instance variables:
+    * key - Reference to the key of entry.
+    * value - Reference to the value of entry.
+    */
+    protected class HashEntry {
+        
+        private K key;
+        private V value;
+        
+        /** 
+        * Contructor to create a HashEntry.
+        * 
+        * @param key the key for this HashEntry
+        * @param value the value for this HashEntry
+        */
+        public HashEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+        /** 
+        * Method to get the key of this HashEntry. 
+        * 
+        * @return the key
+        */
+        public K getKey() {
+            return key;
+        }
+        /** 
+        * Method to get the value of this HashEntry. 
+        * 
+        * @return the value
+        */
+        public V getValue() {
+            return value;
+        }
+        /** 
+        * Method to set a new value for this HashEntry.
+        * 
+        * @param value the new value to replace previous value 
+        */
+        public void setValue(V value) {
+            this.value = value;
+        }
+    }
+    /** 
+    * A HashtableEnumerator class for implementing an enumeration of
+    * the keys and values in a Hashtable. 
+    * 
+    * 
+    * Instance variables:
+    * data - Reference to Hashtable data.
+    * nextEntry - Reference to the next entry in Hashtable.
+    * index - Reference to the index in data where nextEntry is located.
+    * keys - Determines whether to create an enumeration of keys or values.
+    * list - Reference to an iterator for the Linked List nextEntry is
+    * contained in.
+    */
+    private class HashtableEnumerator<T> implements Enumeration<T> {
+
+        private LinkedList<HashEntry>[] data;
+        private HashEntry nextEntry;
+        private int index;
+        private boolean keys;
+        private ListIterator<HashEntry> list;
+        /** 
+        * Contructor to create a HashtableEnumerator.
+        * 
+        * @param data the underlying array for Hashtable
+        * @param keys boolean value to determine if enumerator
+        * will be for the keys or values
+        */
+        public HashtableEnumerator(LinkedList<HashEntry>[] data, boolean keys) {
+            this.data = data;
+            this.keys = keys;
+            for (int i = 0; i < data.length; i++) {
+                if (data[i] instanceof Object) {
+                    this.nextEntry = data[i].get(0);
+                    this.index = i;
+                    this.list = data[i].listIterator(1);
+                    break;
+                }
+                this.nextEntry = null;
+                this.index = i;
+                this.list = null;
+            } 
+        }
+        /** 
+        * Method to determine if there are more elements in HashtableEnumerator.
+        * 
+        * @return true if there are more elements, false otherwise
+        */
+        public boolean hasMoreElements() {
+            return nextEntry != null;
+        }
+        /** 
+        * Method to get element in HashtableEnumerator.
+        * 
+        * @return the next element or throws NoSuchElementException if there 
+        * are no more elements
+        */
+        public T nextElement() {
+            if (hasMoreElements()) {
+                HashEntry currEntry = nextEntry;
+                if (list.hasNext()) {
+                    nextEntry = list.next();
+                }
+                else if (index == data.length - 1) {
+                    nextEntry = null;
+                }
+                else {
+                    for (int i = index + 1; i < data.length; i++) {
+                        if (data[i] instanceof Object) {
+                            nextEntry = data[i].get(0);
+                            index = i;
+                            list = data[i].listIterator(1);
+                            break;
+                        }
+                    }
+                }
+                return keys ? (T) currEntry.getKey() : (T) currEntry.getValue();
+            }
+            throw new NoSuchElementException();
+        }
+    }
+    /** 
     * Default contructor to create MyHashtableSC. 
     */
     public MyHashtableSC() {
-        data = (HashEntry<K,V>[]) new HashEntry[DEFAULT_CAPACITY];
+        data = (LinkedList<HashEntry>[]) new LinkedList[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -48,7 +180,7 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry<K,V>[]) new HashEntry[initialCapacity];
+        data = (LinkedList<HashEntry>[]) new LinkedList[initialCapacity];
         loadFactor = DEFAULT_LOAD_FACTOR;
         size = 0;
     }
@@ -66,9 +198,20 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
             throw new IllegalArgumentException();
         }
         
-        data = (HashEntry<K,V>[]) new HashEntry[initialCapacity];
+        data = (LinkedList<HashEntry>[]) new LinkedList[initialCapacity];
         this.loadFactor = loadFactor;
         size = 0;
+    }
+    /**
+     * Method to create a HashEntry object.
+     * 
+     * @param key the key for the entry
+     * @param value the value for the entry
+     * 
+     * @return a HashEntry object
+     */
+    public HashEntry entry(K key, V value) {
+        return new HashEntry(key, value);
     }
     /** 
     * Method to get size of Hashtable.
@@ -112,10 +255,11 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
             return null;
         }
 
-        HashEntry<K,V> entry = data[hash];
+        ListIterator<HashEntry> list = data[hash].listIterator(1);
+        HashEntry entry = data[hash].get(0);
 
-        while (entry.getNext() != null && !key.equals(entry.getKey())) {
-            entry = entry.getNext();
+        while (list.hasNext() && !key.equals(entry.getKey())) {
+            entry = list.next();
         }
 
         if (key.equals(entry.getKey())) {
@@ -150,10 +294,10 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
             return false;
         }
 
-        HashEntry<K,V> entry = data[hash];
-
-        while (entry.getNext() != null && !key.equals(entry.getKey())) {
-            entry = entry.getNext();
+        ListIterator<HashEntry> list = data[hash].listIterator(1);
+        HashEntry entry = data[hash].get(0);
+        while (list.hasNext() && !key.equals(entry.getKey())) {
+            entry = list.next();
         }
 
         return key.equals(entry.getKey());
@@ -185,15 +329,17 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
         }
 
         if (data[hash] == null) {
-            data[hash] = new HashEntry<>(key, value);
+            data[hash] = new LinkedList<>();
+            data[hash].add(new HashEntry(key,value));
             size++;
             return null;
         }
 
-        HashEntry<K,V> entry = data[hash];
+        ListIterator<HashEntry> list = data[hash].listIterator(1);
+        HashEntry entry = data[hash].get(0);
 
-        while (entry.getNext() != null && !key.equals(entry.getKey())) {
-            entry = entry.getNext();
+        while (list.hasNext() && !key.equals(entry.getKey())) {
+            entry = list.next();
         }
 
         if (key.equals(entry.getKey())) {
@@ -202,7 +348,7 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
             return replacedValue;
         }
 
-        entry.setNext(new HashEntry<>(key,value)); 
+        list.add(new HashEntry(key,value)); 
         size++;
         return null;
     }
@@ -211,38 +357,27 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
     * entries into larger array.
     */
     public void rehash() {
-        HashEntry<K,V>[] newData = (HashEntry<K,V>[]) 
-                new HashEntry[(data.length << 1) + 1];
+        LinkedList<HashEntry>[] newData = (LinkedList<HashEntry>[]) 
+                new LinkedList[(data.length << 1) + 1];
 
-        for (int i = 0; i < data.length; i++) {
-            HashEntry<K,V> entry = data[i];
-            while (entry != null) {
-                int hash = entry.getKey().hashCode() % newData.length;
-                if (hash < 0) {
-                    hash += data.length;
-                }
-
-                if (newData[hash] 
-                        == null) {
-                    newData[hash] = entry;
-                    
-                    HashEntry<K,V> temp = entry;
-                    entry = entry.getNext();
-                    temp.setNext(null);
-                }
-
-                else {
-                    HashEntry<K,V> setEntry = 
-                            newData[hash];
-                    while (setEntry.getNext() != null) {
-                        setEntry = setEntry.getNext();
+        for (LinkedList<HashEntry> s: data) {
+            if (s!= null){
+                ListIterator<HashEntry> list = s.listIterator(0);
+                while (list.hasNext()) {
+                    HashEntry entry = list.next();
+                    int hash = entry.getKey().hashCode() % newData.length;
+                    if (hash < 0) {
+                        hash += data.length;
                     }
 
-                    setEntry.setNext(entry);
-                    HashEntry<K,V> temp = entry;
-                    entry = entry.getNext();
-                    temp.setNext(null);
+                    if (newData[hash] == null) {
+                        newData[hash] = new LinkedList<>();
+                        newData[hash].add(entry);
+                    }
 
+                    else {
+                        newData[hash].add(entry);
+                    }
                 }
             }
         }
@@ -274,27 +409,22 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
             return null;
         }
 
-        HashEntry<K,V> entry = data[hash];
+        ListIterator<HashEntry> list = data[hash].listIterator(0);
+        HashEntry entry = list.next();
+
+        while (list.hasNext() && !key.equals(entry.getKey())) {
+            entry = list.next();
+        }
 
         if (key.equals(entry.getKey())) {
             V removedValue = entry.getValue();
-            data[hash] = entry.getNext();
+            list.remove();
             size--;
+            if (data[hash].size() == 0) {
+                data[hash] = null;
+            }
             return removedValue;
         }
-
-        while (entry.getNext() != null && 
-                !key.equals(entry.getNext().getKey())) {
-            entry = entry.getNext();
-        }
-
-        if (entry.getNext() != null) {
-            V removedValue = entry.getNext().getValue();
-            entry.setNext(entry.getNext().getNext());
-            size--;
-            return removedValue;
-        }
-
         return null;
     }
     /** 
@@ -314,17 +444,17 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
 
         for (int i = 0; i < data.length; i++) {
             if (data[i] instanceof Object) {
-                HashEntry<K,V> entry = data[i];
-                while (entry != null) {
-                    if (value.equals(entry.getValue())) {
-                        return true;
-                    }
-
-                    entry = entry.getNext();
+                ListIterator<HashEntry> list = data[i].listIterator(1);
+                HashEntry entry = data[i].get(0);
+                while (list.hasNext() && !value.equals(entry.getValue())) {
+                    System.out.println(entry.getValue());
+                    entry = list.next();
                 }
+                if (value.equals(entry.getValue())) {
+                    return true;
+                }   
             }
         }
-
         return false;
     }
     /** 
@@ -333,19 +463,27 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
     public void clear() {
         if (size > 0) {
             for (int i = 0; i < data.length; i++) {
-                if (data[i] instanceof HashEntry) {
+                if (data[i] instanceof Object) {
                     data[i] = null;
                 }
             }
             size = 0;
         }
     }
-    
+    /** 
+    * Method to get an enumeration of the keys in Hashtable.
+    *
+    * @return an enumeration of the keys
+    */
     public Enumeration<K> keys() {
-        return new HashtableKeyEnumerator<>(data);
+        return (Enumeration<K>) new HashtableEnumerator(data,true);
     }
-    
+    /** 
+    * Method to get an enumeration of the values in Hashtable.
+    *
+    * @return an enumeration of the values
+    */
     public Enumeration<V> elements() {
-        return new HashtableValueEnumerator<>(data);
+        return (Enumeration<V>) new HashtableEnumerator(data,false);
     }
 }
