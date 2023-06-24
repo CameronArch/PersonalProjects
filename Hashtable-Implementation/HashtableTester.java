@@ -9,6 +9,9 @@
 import org.junit.*;
 
 import static org.junit.Assert.*;
+
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 /** 
 * A HashtableTester class for testing MyHashtableSC and MyHashtableLP. 
 */
@@ -310,8 +313,7 @@ public class HashtableTester {
         MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
         test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
         test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
-		test2.data["two".hashCode() % 11]
-                .setNext(new HashEntry<>("eight", 8));
+		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
 		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
         test2.data[10] = new HashEntry<>("nine", 5);
         test2.size = 6;
@@ -328,5 +330,83 @@ public class HashtableTester {
         assertEquals(null,test2.get("nine"));
         assertThrows(NullPointerException.class,
                 () -> test.get(null));
+    }
+    /** 
+    * Tests keys() of MyHashtableSC.
+    */
+    @Test
+    public void testKeysSC() {
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
+		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+        test2.data[10] = new HashEntry<>("nine", 5);
+        test2.size = 6;
+
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
+
+        MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0);
+
+        Enumeration<String> l = test.keys();
+        assertThrows(NoSuchElementException.class, () -> l.nextElement());
+        assertEquals(false, l.hasMoreElements());
+
+        Enumeration<String> v = test3.keys();
+        assertThrows(NoSuchElementException.class, () -> v.nextElement());
+        assertEquals(false, v.hasMoreElements());
+
+        Enumeration<String> x = test2.keys();
+        assertEquals(true, x.hasMoreElements());
+		assertEquals("one", x.nextElement());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals("two", x.nextElement());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals("eight", x.nextElement());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals("five", x.nextElement());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals("nine", x.nextElement());
+		assertEquals(false, x.hasMoreElements());
+		assertThrows(NoSuchElementException.class, () -> x.nextElement());
+    }
+	/** 
+    * Tests elements() of MyHashtableSC.
+    */
+    @Test
+    public void testElementsSC() {
+        MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
+        test2.data["one".hashCode() % 11] = new HashEntry<>("one", 1);
+        test2.data["two".hashCode() % 11] = new HashEntry<>("two", 2);
+		test2.data["two".hashCode() % 11].setNext(new HashEntry<>("eight", 8));
+		test2.data["five".hashCode() % 11] = new HashEntry<>("five", 5);
+        test2.data[10] = new HashEntry<>("nine", 9);
+        test2.size = 6;
+
+        MyHashtableSC<String,Integer> test = new MyHashtableSC<>();
+
+        MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0);
+
+        Enumeration<Integer> l = test.elements();
+        assertThrows(NoSuchElementException.class, () -> l.nextElement());
+        assertEquals(false, l.hasMoreElements());
+
+        Enumeration<Integer> v = test3.elements();
+        assertThrows(NoSuchElementException.class, () -> v.nextElement());
+        assertEquals(false, v.hasMoreElements());
+
+        Enumeration<Integer> x = test2.elements();
+        assertEquals(true, x.hasMoreElements());
+		assertEquals(1, x.nextElement().intValue());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals(2, x.nextElement().intValue());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals(8, x.nextElement().intValue());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals(5, x.nextElement().intValue());
+		assertEquals(true, x.hasMoreElements());
+		assertEquals(9, x.nextElement().intValue());
+		assertEquals(false, x.hasMoreElements());
+		assertThrows(NoSuchElementException.class, () -> x.nextElement());
     }
 }

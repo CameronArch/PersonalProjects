@@ -2,13 +2,13 @@
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
-public class HashtableKeyEnumerator<K,V> implements Enumeration<K> {
+public class HashtableValueEnumerator<K,V> implements Enumeration<V> {
 
     private HashEntry<K,V>[] data;
     private HashEntry<K,V> nextEntry;
     private int index;
 
-    public HashtableKeyEnumerator(HashEntry<K,V>[] data) {
+    public HashtableValueEnumerator(HashEntry<K,V>[] data) {
         this.data = data;
         for (int i = 0; i < data.length; i++) {
             this.nextEntry = data[i];
@@ -23,7 +23,7 @@ public class HashtableKeyEnumerator<K,V> implements Enumeration<K> {
         return nextEntry != null;
     }
     
-    public K nextElement() {
+    public V nextElement() {
         if (hasMoreElements()) {
             HashEntry<K,V> currEntry = nextEntry;
             if (currEntry.getNext() != null) {
@@ -41,7 +41,7 @@ public class HashtableKeyEnumerator<K,V> implements Enumeration<K> {
                     }
                 }
             }
-            return currEntry.getKey();
+            return currEntry.getValue();
         }
         throw new NoSuchElementException();
     }

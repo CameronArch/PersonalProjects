@@ -217,7 +217,7 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
         for (int i = 0; i < data.length; i++) {
             HashEntry<K,V> entry = data[i];
             while (entry != null) {
-                int hash = entry.getKey().hashCode() % data.length;
+                int hash = entry.getKey().hashCode() % newData.length;
                 if (hash < 0) {
                     hash += data.length;
                 }
@@ -342,10 +342,10 @@ class MyHashtableSC<K,V> extends Dictionary<K,V> {
     }
     
     public Enumeration<K> keys() {
-        return new HashtableKeyEnumerator<>(data,true);
+        return new HashtableKeyEnumerator<>(data);
     }
     
     public Enumeration<V> elements() {
-        return new HashtableValueEnumerator<>(data,false);
+        return new HashtableValueEnumerator<>(data);
     }
 }
