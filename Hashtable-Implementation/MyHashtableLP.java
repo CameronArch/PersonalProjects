@@ -7,6 +7,8 @@
   and the methods associated to them.
 */
 
+import java.util.Dictionary;
+
 /** 
  * A MyHashtableLP class for implementing a Hashtable with 
  * linear probing and associated methods for a Hashtable. 
@@ -17,7 +19,7 @@
  * size - Reference to amount of elements in Hashtable.
  * loadFactor - Reference to maximum load factor for Hashtable before resize.
 */
-class MyHashtableLP<K,V> {
+class MyHashtableLP<K,V> extends Dictionary<K,V>{
     
     HashEntry<K,V>[] data;
     int size;
@@ -92,18 +94,24 @@ class MyHashtableLP<K,V> {
     *
     * @return the value of the entry with matching key or null otherwise
     */
-    public V get(K key) {
+    public V get(Object key) {
         if (key == null) {
             throw new NullPointerException();
         }
         if (data.length == 0) {
             return null;
         }
-        if (data[key.hashCode() % data.length] == null) {
+        
+        int hash = key.hashCode() % data.length;
+        if (hash < 0) {
+            hash += data.length;
+        }
+        
+        if (data[hash] == null) {
             return null;
         }
 
-        HashEntry<K,V> entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[hash];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -131,11 +139,17 @@ class MyHashtableLP<K,V> {
         if (data.length == 0) {
             return false;
         }
-        if (data[key.hashCode() % data.length] == null) {
+
+        int hash = key.hashCode() % data.length;
+        if (hash < 0) {
+            hash += data.length;
+        }
+
+        if (data[hash] == null) {
             return false;
         }
 
-        HashEntry<K,V> entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[hash];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -164,13 +178,18 @@ class MyHashtableLP<K,V> {
             rehash();
         }
 
-        if (data[key.hashCode() % data.length] == null) {
-            data[key.hashCode() % data.length] = new HashEntry<>(key, value);
+        int hash = key.hashCode() % data.length;
+        if (hash < 0) {
+            hash += data.length;
+        }
+
+        if (data[hash] == null) {
+            data[hash] = new HashEntry<>(key, value);
             size++;
             return null;
         }
 
-        HashEntry<K,V> entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[hash];
 
         while (entry.getNext() != null && !key.equals(entry.getKey())) {
             entry = entry.getNext();
@@ -197,9 +216,14 @@ class MyHashtableLP<K,V> {
         for (int i = 0; i < data.length; i++) {
             HashEntry<K,V> entry = data[i];
             while (entry != null) {
-                if (newData[entry.getKey().hashCode() % newData.length] 
+                int hash = entry.getKey().hashCode() % newData.length;
+                if (hash < 0) {
+                    hash += data.length;
+                }
+
+                if (newData[hash] 
                         == null) {
-                    newData[entry.getKey().hashCode() % newData.length] = entry;
+                    newData[hash] = entry;
                     
                     HashEntry<K,V> temp = entry;
                     entry = entry.getNext();
@@ -208,7 +232,7 @@ class MyHashtableLP<K,V> {
 
                 else {
                     HashEntry<K,V> setEntry = 
-                            newData[entry.getKey().hashCode() % newData.length];
+                            newData[hash];
                     while (setEntry.getNext() != null) {
                         setEntry = setEntry.getNext();
                     }
@@ -232,22 +256,28 @@ class MyHashtableLP<K,V> {
     * @return the value of the removed entry or null if no entry exists 
     * with given key.
     */
-    public V remove(K key) {
+    public V remove(Object key) {
         if (key == null) {
             throw new NullPointerException();
         }
         if (data.length == 0) {
             return null;
         }
-        if (data[key.hashCode() % data.length] == null) {
+
+        int hash = key.hashCode() % data.length;
+        if (hash < 0) {
+            hash += data.length;
+        }
+
+        if (data[hash] == null) {
             return null;
         }
 
-        HashEntry<K,V> entry = data[key.hashCode() % data.length];
+        HashEntry<K,V> entry = data[hash];
 
         if (key.equals(entry.getKey())) {
             V removedValue = entry.getValue();
-            data[key.hashCode() % data.length] = entry.getNext();
+            data[hash] = entry.getNext();
             size--;
             return removedValue;
         }
