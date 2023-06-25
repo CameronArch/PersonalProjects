@@ -68,7 +68,7 @@ class MyHashtableLP<K,V> extends Dictionary<K,V> {
         /** 
         * Method to set a new key for this HashEntry.
         * 
-        * @param value the new key to replace previous key 
+        * @param key the new key to replace previous key 
         */
         public void setKey(K key) {
             this.key = key;

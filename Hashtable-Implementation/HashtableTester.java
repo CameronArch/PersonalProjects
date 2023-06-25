@@ -119,12 +119,14 @@ public class HashtableTester {
 
         assertEquals(null,test.put("one",1));
         assertEquals(1,test.size);
-        assertEquals(1,test.data["one".hashCode() % 11].get(0).getValue().intValue());
+        assertEquals(1,test.data["one".hashCode() % 11]
+                .get(0).getValue().intValue());
         assertEquals("one",test.data["one".hashCode() % 11].get(0).getKey());
 
         assertEquals(1,test.put("one",2).intValue());
         assertEquals(1,test.size);
-        assertEquals(2,test.data["one".hashCode() % 11].get(0).getValue().intValue());
+        assertEquals(2,test.data["one".hashCode() % 11]
+                .get(0).getValue().intValue());
         assertEquals("one",test.data["one".hashCode() % 11].get(0).getKey());
 
         MyHashtableSC<String,Integer> test2 = new MyHashtableSC<>();
@@ -174,7 +176,8 @@ public class HashtableTester {
 		assertEquals(3,test3.size);
 		assertEquals(3,test3.data["three".hashCode() % 9]
                 .get(0).getValue().intValue());
-        assertEquals("three",test3.data["three".hashCode() % 9].get(0).getKey());
+        assertEquals("three",test3.data["three".hashCode() % 9]
+                .get(0).getKey());
 		assertEquals(9,test3.data.length);
 
         MyHashtableSC<String,Integer> test4 = new MyHashtableSC<>(0);
@@ -377,11 +380,13 @@ public class HashtableTester {
         MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0);
 
         Enumeration<String> l = test.keys();
-        assertThrows(NoSuchElementException.class, () -> l.nextElement());
+        assertThrows(NoSuchElementException.class, 
+                () -> l.nextElement());
         assertEquals(false, l.hasMoreElements());
 
         Enumeration<String> v = test3.keys();
-        assertThrows(NoSuchElementException.class, () -> v.nextElement());
+        assertThrows(NoSuchElementException.class, 
+                () -> v.nextElement());
         assertEquals(false, v.hasMoreElements());
 
         Enumeration<String> x = test2.keys();
@@ -396,7 +401,8 @@ public class HashtableTester {
 		assertEquals(true, x.hasMoreElements());
 		assertEquals("nine", x.nextElement());
 		assertEquals(false, x.hasMoreElements());
-		assertThrows(NoSuchElementException.class, () -> x.nextElement());
+		assertThrows(NoSuchElementException.class, 
+                () -> x.nextElement());
     }
     /** 
     * Tests elements() of MyHashtableSC.
@@ -420,11 +426,13 @@ public class HashtableTester {
         MyHashtableSC<String,Integer> test3 = new MyHashtableSC<>(0);
 
         Enumeration<Integer> l = test.elements();
-        assertThrows(NoSuchElementException.class, () -> l.nextElement());
+        assertThrows(NoSuchElementException.class, 
+                () -> l.nextElement());
         assertEquals(false, l.hasMoreElements());
 
         Enumeration<Integer> v = test3.elements();
-        assertThrows(NoSuchElementException.class, () -> v.nextElement());
+        assertThrows(NoSuchElementException.class, 
+                () -> v.nextElement());
         assertEquals(false, v.hasMoreElements());
 
         Enumeration<Integer> x = test2.elements();
@@ -438,9 +446,10 @@ public class HashtableTester {
 		assertEquals(5, x.nextElement().intValue());
 		assertEquals(9, x.nextElement().intValue());
 		assertEquals(false, x.hasMoreElements());
-		assertThrows(NoSuchElementException.class, () -> x.nextElement());
+		assertThrows(NoSuchElementException.class, 
+                () -> x.nextElement());
     }
-	/** 
+    /** 
     * Tests contructors of MyHashtableLP.
     */
     @Test
@@ -473,7 +482,7 @@ public class HashtableTester {
 		assertThrows(IllegalArgumentException.class,
                 () -> new MyHashtableLP<>(0,1.01));
     }
-	/** 
+    /** 
     * Tests rehash() of MyHashtableLP.
     */
     @Test
@@ -524,7 +533,7 @@ public class HashtableTester {
         assertEquals(15,test2.data[6]
                 .getValue().intValue());	
     }
-	/** 
+    /** 
     * Tests put() of MyHashtableLP.
     */
     @Test
@@ -628,7 +637,7 @@ public class HashtableTester {
 		assertEquals(20,test6.data[4].getValue().intValue());
 		assertEquals("3",test6.data[4].getKey());
     }
-	/** 
+    /** 
     * Tests containsKey() of MyHashtableLP.
     */
     @Test
@@ -686,7 +695,7 @@ public class HashtableTester {
         MyHashtableLP<String,Integer> test = new MyHashtableLP<>(0);
         assertEquals(false,test.containsValue(2));
     }
-	/** 
+    /** 
     * Tests clear() of MyHashtableLP.
     */
     @Test
@@ -720,7 +729,7 @@ public class HashtableTester {
             assertEquals(null,test2.data[i]);
         }
     }
-	/** 
+    /** 
     * Tests remove() of MyHashtableLP.
     */
     @Test
@@ -760,7 +769,7 @@ public class HashtableTester {
 		assertEquals(null,test2.remove("3"));
 		assertEquals(4, test2.size);
     }
-	/** 
+    /** 
     * Tests get() of MyHashtableLP.
     */
     @Test
@@ -790,7 +799,7 @@ public class HashtableTester {
         assertThrows(NullPointerException.class,
                 () -> test.get(null));
     }
-	/** 
+    /** 
     * Tests keys() of MyHashtableLP.
     */
     @Test
@@ -834,7 +843,8 @@ public class HashtableTester {
 		assertEquals(true, x.hasMoreElements());
 		assertEquals("3", x.nextElement());
 		assertEquals(false, x.hasMoreElements());
-		assertThrows(NoSuchElementException.class, () -> x.nextElement());
+		assertThrows(NoSuchElementException.class, 
+                () -> x.nextElement());
     }
     /** 
     * Tests elements() of MyHashtableLP.
@@ -878,6 +888,7 @@ public class HashtableTester {
 		assertEquals(true, x.hasMoreElements());
 		assertEquals(11, x.nextElement().intValue());
 		assertEquals(false, x.hasMoreElements());
-		assertThrows(NoSuchElementException.class, () -> x.nextElement());
+		assertThrows(NoSuchElementException.class, 
+                () -> x.nextElement());
     }
 }
