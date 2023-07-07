@@ -47,19 +47,19 @@ def decrypt(file_path, password):
     with open(file_path, "wb") as file:
         file.write(decrypted)
 
-input_file = input("Enter file path:")
+input_file = input("Enter file path:").strip()
 
 if not os.path.exists(input_file):
     print("File not found")
     sys.exit()
 
-input_choice = input("Enter choice (encrypt/decrypt):")
+input_choice = input("Enter choice (encrypt/decrypt):").strip()
 
 while input_choice not in ["encrypt", "decrypt"]:
     print("Invalid choice")
     input_choice = input("Enter choice (encrypt/decrypt):")
 
-input_password = input("Enter password:")
+input_password = input("Enter password:").strip()
 
 if input_choice == "encrypt":
     encrypt(input_file, input_password)
