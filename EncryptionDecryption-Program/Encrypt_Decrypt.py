@@ -47,10 +47,20 @@ def decrypt(file_path, password):
     with open(file_path, "wb") as file:
         file.write(decrypted)
 
+def encrypt_path(directory_path,password):
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            encrypt(os.path.join(root, file), password)
+
+def decrypt_path(directory_path,password):
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            decrypt(os.path.join(root, file), password)
+
 input_file = input("Enter file path:").strip()
 
 if not os.path.exists(input_file):
-    print("File not found")
+    print("Path does not exist")
     sys.exit()
 
 input_choice = input("Enter choice (encrypt/decrypt):").strip()
@@ -62,7 +72,13 @@ while input_choice not in ["encrypt", "decrypt"]:
 input_password = input("Enter password:").strip()
 
 if input_choice == "encrypt":
-    encrypt(input_file, input_password)
+    if os.path.isfile(input_file):
+        encrypt(input_file, input_password)
+    else:
+        encrypt_path(input_file, input_password)
 
 else:
-    decrypt(input_file, input_password)
+    if os.path.isfile(input_file):
+        decrypt(input_file, input_password)
+    else:
+        decrypt_path(input_file, input_password)
