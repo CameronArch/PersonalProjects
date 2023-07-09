@@ -1,6 +1,7 @@
 import base64
 import os
 import sys
+import tkinter as tk
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.fernet import Fernet, InvalidToken
@@ -53,8 +54,6 @@ def decrypt(file_path, password):
 
     except InvalidToken:
         print("Incorrect Password")
-        password = input("Enter password:").strip()
-        decrypt(file_path, password)
 
 def encrypt_path(directory_path,password):
     for root, dirs, files in os.walk(directory_path):
@@ -66,29 +65,101 @@ def decrypt_path(directory_path,password):
         for file in files:
             decrypt(os.path.join(root, file), password)
 
-input_file = input("Enter file path:").strip()
+def is_encrypt():
+    global cipher
+    cipher = True
+    print("Encryption Selected")
 
-while not os.path.exists(input_file):
-    print("Path does not exist")
-    input_file = input("Enter file path:").strip()
-    
+def is_decrypt():
+    global cipher
+    cipher = False
+    print("Decryption Selected")
 
-input_choice = input("Enter choice (encrypt/decrypt):").strip()
-
-while input_choice not in ["encrypt", "decrypt"]:
-    print("Invalid choice")
-    input_choice = input("Enter choice (encrypt/decrypt):")
-
-input_password = input("Enter password:").strip()
-
-if input_choice == "encrypt":
-    if os.path.isfile(input_file):
-        encrypt(input_file, input_password)
+def start():
+    if cipher != None:
+        if cipher == True:
+            start_encrypt()
+        else:
+            start_decrypt()
     else:
-        encrypt_path(input_file, input_password)
+        print("Select Encrypt or Decrypt")
 
-else:
-    if os.path.isfile(input_file):
-        decrypt(input_file, input_password)
+def start_encrypt():
+    if proceed == True and input_password != None:
+        if os.path.isfile(input_path):
+            encrypt(input_path, input_password)
+        else:
+            encrypt_path(input_path, input_password)
+    elif proceed == False and input_password == None:
+        print("Enter a Valid Path and Password")
+    elif proceed == False:
+        print("Enter a Valid Path")
     else:
-        decrypt_path(input_file, input_password)
+        print("Enter Password")
+
+def start_decrypt():
+    if proceed == True and input_password != None:
+        if os.path.isfile(input_path):
+            decrypt(input_path, input_password)
+        else:
+            decrypt_path(input_path, input_password)            
+    elif proceed == False and input_password == None:
+        print("Enter a Valid Path and Password")
+    elif proceed == False:
+        print("Enter a Valid Path")
+    else:
+        print("Enter Password")
+
+def get_path():
+    global proceed 
+    global input_path
+    input_path = text_box.get()
+
+    if os.path.exists(input_path):
+        print("Path Exists")
+        proceed = True
+    else:
+        print("Path Does Not Exist")
+
+def get_password():
+    global input_password
+    input_password = text_box2.get()
+    print("Password Entered")
+
+window = tk.Tk()
+proceed = False
+cipher = None
+input_password = None
+
+label = tk.Label(text="Encryption and Decryption Program", font=("Arial", 20))
+label.pack()
+
+text_box = tk.Entry(window, width=50, borderwidth=5)
+text_box.insert(tk.END, "Enter File Path")
+text_box.pack()
+
+button = tk.Button(window, text="Enter", padx=10, pady=5, fg="white", bg="black", command= get_path)
+button.pack()
+
+
+button2 = tk.Button(window, text="Encrypt", padx=10, pady=5, fg="white", bg="black", command= is_encrypt)
+button2.pack()
+
+
+button3 = tk.Button(window, text="Decrypt", padx=10, pady=5, fg="white", bg="black", command= is_decrypt)
+button3.pack()
+
+text_box2 = tk.Entry(window, width=50, borderwidth=5)
+text_box2.insert(tk.END, "Enter Password")
+text_box2.pack()
+
+button4 = tk.Button(window, text="Enter", padx=10, pady=5, fg="white", bg="black", command= get_password)
+button4.pack()
+
+
+button5 = tk.Button(window, text="Start Program", padx=10, pady=5, fg="white", bg="black", command= start)
+button5.pack()
+
+
+window.mainloop()
+
