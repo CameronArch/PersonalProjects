@@ -3,7 +3,7 @@ import os
 import sys
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 def generate_key(password, salt):
     if isinstance(password, str):
@@ -33,19 +33,28 @@ def encrypt(file_path, password):
     with open(file_path, "wb") as file:
         file.write(salt + encrpted)
 
+    print("Encryption Successful")
+
 def decrypt(file_path, password):
     with open(file_path, "rb") as file:
         file_data = file.read()
         salt = file_data[:16]
         encrypted_data = file_data[16:]
-    
-    key = base64.urlsafe_b64encode(generate_key(password, salt))
-    fernet = Fernet(key)
+    try:
+        key = base64.urlsafe_b64encode(generate_key(password, salt))
+        fernet = Fernet(key)
+        
+        decrypted = fernet.decrypt(encrypted_data)
 
-    decrypted = fernet.decrypt(encrypted_data)
+        with open(file_path, "wb") as file:
+            file.write(decrypted)
 
-    with open(file_path, "wb") as file:
-        file.write(decrypted)
+        print("Decryption Successful")
+
+    except InvalidToken:
+        print("Incorrect Password")
+        password = input("Enter password:").strip()
+        decrypt(file_path, password)
 
 def encrypt_path(directory_path,password):
     for root, dirs, files in os.walk(directory_path):
@@ -59,9 +68,10 @@ def decrypt_path(directory_path,password):
 
 input_file = input("Enter file path:").strip()
 
-if not os.path.exists(input_file):
+while not os.path.exists(input_file):
     print("Path does not exist")
-    sys.exit()
+    input_file = input("Enter file path:").strip()
+    
 
 input_choice = input("Enter choice (encrypt/decrypt):").strip()
 
