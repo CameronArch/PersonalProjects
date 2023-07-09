@@ -1,6 +1,5 @@
 import base64
 import os
-import sys
 import tkinter as tk
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
