@@ -186,4 +186,3 @@ text_widget = tk.Text(window)
 text_widget.pack()
 
 window.mainloop()
-
