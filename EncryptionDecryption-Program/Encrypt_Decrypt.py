@@ -1,5 +1,7 @@
 import base64
+from io import StringIO
 import os
+import sys
 import tkinter as tk
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -34,6 +36,7 @@ def encrypt(file_path, password):
         file.write(salt + encrpted)
 
     print("Encryption Successful")
+    get_output()
 
 def decrypt(file_path, password):
     with open(file_path, "rb") as file:
@@ -50,9 +53,11 @@ def decrypt(file_path, password):
             file.write(decrypted)
 
         print("Decryption Successful")
+        get_output()
 
     except InvalidToken:
         print("Incorrect Password")
+        get_output()
 
 def encrypt_path(directory_path,password):
     for root, dirs, files in os.walk(directory_path):
@@ -68,11 +73,13 @@ def is_encrypt():
     global cipher
     cipher = True
     print("Encryption Selected")
+    get_output()
 
 def is_decrypt():
     global cipher
     cipher = False
     print("Decryption Selected")
+    get_output()
 
 def start():
     if cipher != None:
@@ -82,6 +89,7 @@ def start():
             start_decrypt()
     else:
         print("Select Encrypt or Decrypt")
+        get_output()
 
 def start_encrypt():
     if proceed == True and input_password != None:
@@ -91,10 +99,13 @@ def start_encrypt():
             encrypt_path(input_path, input_password)
     elif proceed == False and input_password == None:
         print("Enter a Valid Path and Password")
+        get_output()
     elif proceed == False:
         print("Enter a Valid Path")
+        get_output()
     else:
         print("Enter Password")
+        get_output()
 
 def start_decrypt():
     if proceed == True and input_password != None:
@@ -104,10 +115,13 @@ def start_decrypt():
             decrypt_path(input_path, input_password)            
     elif proceed == False and input_password == None:
         print("Enter a Valid Path and Password")
+        get_output()
     elif proceed == False:
         print("Enter a Valid Path")
+        get_output()
     else:
         print("Enter Password")
+        get_output()
 
 def get_path():
     global proceed 
@@ -116,19 +130,31 @@ def get_path():
 
     if os.path.exists(input_path):
         print("Path Exists")
+        get_output()
         proceed = True
     else:
         print("Path Does Not Exist")
+        get_output()
 
 def get_password():
     global input_password
     input_password = text_box2.get()
     print("Password Entered")
+    get_output()
+
+def get_output():
+    output_text = output.getvalue().strip() + "\n"
+    text_widget.insert(tk.END, output_text)
+    output.truncate(0)
+    output.seek(0)
 
 window = tk.Tk()
 proceed = False
 cipher = None
 input_password = None
+
+output = StringIO()
+sys.stdout = output
 
 label = tk.Label(text="Encryption and Decryption Program", font=("Arial", 20))
 label.pack()
@@ -140,10 +166,8 @@ text_box.pack()
 button = tk.Button(window, text="Enter", padx=10, pady=5, fg="white", bg="black", command= get_path)
 button.pack()
 
-
 button2 = tk.Button(window, text="Encrypt", padx=10, pady=5, fg="white", bg="black", command= is_encrypt)
 button2.pack()
-
 
 button3 = tk.Button(window, text="Decrypt", padx=10, pady=5, fg="white", bg="black", command= is_decrypt)
 button3.pack()
@@ -155,9 +179,11 @@ text_box2.pack()
 button4 = tk.Button(window, text="Enter", padx=10, pady=5, fg="white", bg="black", command= get_password)
 button4.pack()
 
-
 button5 = tk.Button(window, text="Start Program", padx=10, pady=5, fg="white", bg="black", command= start)
 button5.pack()
+
+text_widget = tk.Text(window)
+text_widget.pack()
 
 window.mainloop()
 
