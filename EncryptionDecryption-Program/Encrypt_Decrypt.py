@@ -97,6 +97,7 @@ def start_encrypt():
             encrypt(input_path, input_password)
         else:
             encrypt_path(input_path, input_password)
+        reset()
     elif proceed == False and input_password == None:
         print("Enter a Valid Path and Password")
         get_output()
@@ -112,7 +113,8 @@ def start_decrypt():
         if os.path.isfile(input_path):
             decrypt(input_path, input_password)
         else:
-            decrypt_path(input_path, input_password)            
+            decrypt_path(input_path, input_password)
+        reset()            
     elif proceed == False and input_password == None:
         print("Enter a Valid Path and Password")
         get_output()
@@ -147,6 +149,16 @@ def get_output():
     text_widget.insert(tk.END, output_text)
     output.truncate(0)
     output.seek(0)
+
+def reset():
+    global proceed
+    global cipher
+    global input_path
+    global input_password
+    proceed = False
+    cipher = None
+    input_path = None
+    input_password = None
 
 window = tk.Tk()
 proceed = False
