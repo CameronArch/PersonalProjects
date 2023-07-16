@@ -1,3 +1,6 @@
+import random
+import string
+
 class PasswordContainer:
     def __init__(self, password, website, username):
         self.password = password
@@ -25,3 +28,20 @@ class PasswordContainer:
     def get_website(self):
         return self.website
     
+def generate_password(length = 12):
+    characters = string.ascii_letters + string.digits + string.punctuation
+
+    password = []
+    password.append(string.ascii_lowercase)
+    password.append(string.ascii_uppercase)
+    password.append(string.digits)
+    password.append(string.punctuation)
+
+    for i in range(length - 4):
+        password.append(random.choice(characters))
+    
+    random.shuffle(password)
+
+    password = "".join(password)
+
+    return password
