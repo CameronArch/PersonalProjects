@@ -45,3 +45,35 @@ def generate_password(length = 12):
     password = "".join(password)
 
     return password
+
+def rate_password(password):
+    score = 0
+
+    length_score = min(len(password) / 4, 4.0)
+    score += length_score
+
+    if any(char.isdigit() for char in password):
+        score += 1.5
+    if any(char.isupper() for char in password):
+        score += 1.5
+    if any(char.islower() for char in password):
+        score += 1.0
+    if any(char in string.punctuation for char in password):
+        score += 2.0
+    
+    penalty = len(password) - len(set(password))
+    score -= min(penalty / 4, 2.0)
+
+    if score < 0:
+        score = 0
+
+    if score > 2.5:
+        strength = "Strong"
+    elif score > 5.0:
+        strength = "Good"
+    elif score > 2.5:
+        strength = "Weak"
+    else:
+        strength = "Very Weak"
+
+    return strength + "\n" + "Score: " + str(score) + "/10.0"
