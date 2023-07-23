@@ -86,11 +86,6 @@ def rate_password(password):
 
     return strength + "\n" + "Score: " + str(score) + "/10.0"
 
-def serialize_password_container(container):
-    return json.dumps(container.__dict__)
-
-def deserialize_password_container(container):
-    return json.loads(container)
 
 
 
