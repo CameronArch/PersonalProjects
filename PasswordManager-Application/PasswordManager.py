@@ -1,5 +1,7 @@
+import json
 import random
 import string
+import sqlite3   
 
 class PasswordContainer:
     def __init__(self, password, website, username):
@@ -27,6 +29,12 @@ class PasswordContainer:
     
     def get_website(self):
         return self.website
+    
+    def serialize(self):
+        return json.dumps(self.__dict__)
+    
+    def deserialize(cls, data):
+        return cls(**json.loads(data))
     
 def generate_password(length = 12):
     characters = string.ascii_letters + string.digits + string.punctuation
@@ -77,3 +85,35 @@ def rate_password(password):
         strength = "Very Weak"
 
     return strength + "\n" + "Score: " + str(score) + "/10.0"
+
+def serialize_password_container(container):
+    return json.dumps(container.__dict__)
+
+def deserialize_password_container(container):
+    return json.loads(container)
+
+
+
+
+
+
+
+
+
+connect = sqlite3.connect("passwords.db")
+cursor = connect.cursor()
+
+cursor.execute("""
+                CREATE TABLE IF NOT EXISTS accounts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT NOT NULL
+                )
+                """)
+
+cursor.execute("""
+                CREATE TABLE IF NOT EXISTS passwords (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    account_id INTEGER NOT NULL,
+                    password BLOB NOT NULL,
+                )
+                """)
