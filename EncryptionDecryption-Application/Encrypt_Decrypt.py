@@ -30,10 +30,10 @@ def encrypt(file_path, password):
     with open(file_path, "rb") as file:
         file_data = file.read()
 
-    encrpted = fernet.encrypt(file_data)
+    encrypted = fernet.encrypt(file_data)
 
     with open(file_path, "wb") as file:
-        file.write(salt + encrpted)
+        file.write(salt + encrypted)
 
     print("Encryption Successful")
     get_output()
