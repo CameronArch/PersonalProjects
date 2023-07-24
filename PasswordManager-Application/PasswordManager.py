@@ -264,6 +264,9 @@ def change_website(container, new_website):
     cursor.close()
     connect.close()
 
+def add_password():
+    
+
 def create_account():
     
 
