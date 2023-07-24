@@ -1,16 +1,24 @@
+import base64
+from io import StringIO
+import os
+import sys
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.fernet import Fernet, InvalidToken
 import json
 import random
 import string
 import sqlite3   
 
 class PasswordContainer:
-    def __init__(self, password, website, username):
+    def __init__(self, id, password, website, username):
+        self.id = id
         self.password = password
         self.website = website
         self.username = username
 
     def __str__(self):
-        return f"Website: {self.website}\nUsername: {self.username}\nPassword: {self.password}"
+        return f"Website: {self.website}\nUsername: {self.username}\nPassword: {self.password}\n"
 
     def change_password(self, new_password):
         self.password = new_password
@@ -20,6 +28,12 @@ class PasswordContainer:
     
     def change_website(self, new_website):
         self.website = new_website
+
+    def change_id(self, new_id):
+        self.id = new_id
+
+    def get_id(self):
+        return self.id
     
     def get_password(self):
         return self.password
@@ -33,8 +47,10 @@ class PasswordContainer:
     def serialize(self):
         return json.dumps(self.__dict__)
     
-    def deserialize(cls, data):
-        return cls(**json.loads(data))
+    def deserialize(cls, data, id):
+        container = cls(**json.loads(data))
+        container.change_id(id)
+        return container
     
 def generate_password(length = 12):
     characters = string.ascii_letters + string.digits + string.punctuation
@@ -75,7 +91,7 @@ def rate_password(password):
     if score < 0:
         score = 0
 
-    if score > 2.5:
+    if score > 7.5:
         strength = "Strong"
     elif score > 5.0:
         strength = "Good"
@@ -84,18 +100,163 @@ def rate_password(password):
     else:
         strength = "Very Weak"
 
-    return strength + "\n" + "Score: " + str(score) + "/10.0"
+    return strength + "\n" + "Score: " + str(score) + "/10.0\n"
 
+def generate_key(salt):
+    if isinstance(account_password, str):
+        password = account_password.encode()
+    else:
+        password = str(account_password).encode()
+    
+    kdf = PBKDF2HMAC(
+        algorithm = hashes.SHA256(),
+        length = 32,
+        salt = salt,
+        iterations = 100000,
+    )
 
+    return(kdf.derive(password)) 
 
+def encrypt(container):
+    salt = os.urandom(16)
+    key = base64.urlsafe_b64encode(generate_key(salt))
+    fernet = Fernet(key)
 
+    encrypted = fernet.encrypt(container.serialize())
 
+    print("Encryption Successful\n")
+    get_output()
 
+    return encrypted
 
+def decrypt(file_path, password):
+    with open(file_path, "rb") as file:
+        file_data = file.read()
+        salt = file_data[:16]
+        encrypted_data = file_data[16:]
+    try:
+        key = base64.urlsafe_b64encode(generate_key(password, salt))
+        fernet = Fernet(key)
+        
+        decrypted = fernet.decrypt(encrypted_data)
 
+        with open(file_path, "wb") as file:
+            file.write(decrypted)
 
+        print("Decryption Successful\n")
+        get_output()
 
-connect = sqlite3.connect("passwords.db")
+    except InvalidToken:
+        print("Incorrect Password\n")
+        get_output()
+
+def account_login(username,password):
+    global account_id
+    global account_username
+    global account_password
+    global passwords
+    account_password = password
+
+    if username == "" and password == "":
+        print("Enter a valid Username and Password\n")
+        get_output()
+    elif username == "":
+        print("Enter a valid Username\n")
+        get_output()
+    elif password == "":
+        print("Enter a valid Password\n")
+        get_output()
+    else :
+        connect = sqlite3.connect("password_manager.db")
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM accounts WHERE username = ?", (username,))
+        account_name = cursor.fetchone()
+        cursor.close()
+        connect.close()
+
+        if account_name:
+            account_id, account_username = account_name
+            
+            passwords = get_passwords()
+            for container in passwords:
+                print(str(container))
+                get_output()
+        else :
+            print("Account does not exist\n")
+            get_output()
+
+def get_passwords():
+    connect = sqlite3.connect("password_manager.db")
+    cursor = connect.cursor()
+
+    cursor.execute("SELECT id, password FROM encrypted_passwords WHERE account_id = ?", (account_id,))
+    passwords_data = cursor.fetchall()
+
+    cursor.close()
+    connect.close()
+
+    passwords = []
+    if passwords_data:
+        for data in passwords_data:
+            id, encrypted_container = data
+            decrypted_data = decrypt(encrypted_container)
+            container = PasswordContainer.deserialize(decrypted_data, id)
+            passwords.append(container)
+    else :
+        print("No passwords contained in account\n")
+        get_output()
+
+    return passwords
+    
+def change_username(container, new_username):
+    container.change_username(new_username) 
+    id = container.get_id()
+
+    encrypted_container = encrypt(container)
+
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE passwords SET password = ? WHERE id = ?", (encrypted_container, id))
+
+    conn.commit()
+
+    cursor.close()
+    connect.close()
+
+def change_password(container, new_password):
+    container.change_password(new_password) 
+    id = container.get_id()
+
+    encrypted_container = encrypt(container)
+
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE passwords SET password = ? WHERE id = ?", (encrypted_container, id))
+
+    conn.commit()
+
+    cursor.close()
+    connect.close()
+
+def change_website(container, new_website):
+    container.change_website(new_website) 
+    id = container.get_id()
+
+    encrypted_container = encrypt(container)
+
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE passwords SET password = ? WHERE id = ?", (encrypted_container, id))
+
+    conn.commit()
+
+    cursor.close()
+    connect.close()
+
+connect = sqlite3.connect("password_manager.db")
 cursor = connect.cursor()
 
 cursor.execute("""
@@ -106,9 +267,14 @@ cursor.execute("""
                 """)
 
 cursor.execute("""
-                CREATE TABLE IF NOT EXISTS passwords (
+                CREATE TABLE IF NOT EXISTS encrypted_passwords (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     account_id INTEGER NOT NULL,
                     password BLOB NOT NULL,
                 )
                 """)
+
+output = StringIO()
+sys.stdout = output
+
+
