@@ -129,26 +129,22 @@ def encrypt(container):
 
     return encrypted
 
-def decrypt(file_path, password):
-    with open(file_path, "rb") as file:
-        file_data = file.read()
-        salt = file_data[:16]
-        encrypted_data = file_data[16:]
+def decrypt(container):
+    salt = container[:16]
+    encrypted_data = container[16:]
     try:
-        key = base64.urlsafe_b64encode(generate_key(password, salt))
+        key = base64.urlsafe_b64encode(generate_key(salt))
         fernet = Fernet(key)
         
         decrypted = fernet.decrypt(encrypted_data)
 
-        with open(file_path, "wb") as file:
-            file.write(decrypted)
-
         print("Decryption Successful\n")
         get_output()
 
+        return decrypted
+
     except InvalidToken:
-        print("Incorrect Password\n")
-        get_output()
+        return None
 
 def account_login(username,password):
     global account_id
@@ -178,9 +174,16 @@ def account_login(username,password):
             account_id, account_username = account_name
             
             passwords = get_passwords()
-            for container in passwords:
-                print(str(container))
+            if passwords is None:
+                print("Incorrect Password\n")
                 get_output()
+            else :
+                print("Login Successful\n")
+                get_output()
+
+                for container in passwords:
+                    print(str(container))
+                    get_output()
         else :
             print("Account does not exist\n")
             get_output()
@@ -200,6 +203,10 @@ def get_passwords():
         for data in passwords_data:
             id, encrypted_container = data
             decrypted_data = decrypt(encrypted_container)
+            
+            if decrypted_data is None:
+                return None
+
             container = PasswordContainer.deserialize(decrypted_data, id)
             passwords.append(container)
     else :
@@ -273,6 +280,10 @@ cursor.execute("""
                     password BLOB NOT NULL,
                 )
                 """)
+
+connect.commit()
+cursor.close()
+connect.close()
 
 output = StringIO()
 sys.stdout = output
