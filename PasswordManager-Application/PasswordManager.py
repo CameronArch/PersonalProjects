@@ -2,6 +2,7 @@ import base64
 from io import StringIO
 import os
 import sys
+import tkinter as tk
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.fernet import Fernet, InvalidToken
@@ -263,6 +264,15 @@ def change_website(container, new_website):
     cursor.close()
     connect.close()
 
+def create_account():
+    
+
+def get_output():
+    output_text = output.getvalue().strip() + "\n"
+    text_widget.insert(tk.END, output_text)
+    output.truncate(0)
+    output.seek(0)
+
 connect = sqlite3.connect("password_manager.db")
 cursor = connect.cursor()
 
@@ -288,4 +298,32 @@ connect.close()
 output = StringIO()
 sys.stdout = output
 
+window = tk.Tk()
 
+label = tk.Label(text="Password Manager", font=("Arial", 20))
+label.pack()
+
+text_box = tk.Entry(window, width=50, borderwidth=5)
+text_box.insert(tk.END, "Enter Username")
+text_box.pack()
+
+text_box2 = tk.Entry(window, width=50, borderwidth=5)
+text_box2.insert(tk.END, "Enter Password")
+text_box2.pack()
+
+button = tk.Button(window, text="Enter", padx=10, pady=5, fg="white", bg="black", command= get_path)
+button.pack()
+
+button2 = tk.Button(window, text="Encrypt", padx=10, pady=5, fg="white", bg="black", command= is_encrypt)
+button2.pack()
+
+button3 = tk.Button(window, text="Decrypt", padx=10, pady=5, fg="white", bg="black", command= is_decrypt)
+button3.pack()
+
+button5 = tk.Button(window, text="Start Program", padx=10, pady=5, fg="white", bg="black", command= start)
+button5.pack()
+
+text_widget = tk.Text(window)
+text_widget.pack()
+
+window.mainloop()
