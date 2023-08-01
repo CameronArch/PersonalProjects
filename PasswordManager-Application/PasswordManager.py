@@ -1,4 +1,5 @@
 import base64
+import hashlib
 from io import StringIO
 import os
 import sys
@@ -147,11 +148,18 @@ def decrypt(container):
     except InvalidToken:
         return None
 
-def account_login(username,password):
+def account_login(text_box, text_box2):
     global account_id
     global account_username
     global account_password
+    global account_password_hash
     global passwords
+
+    username = text_box.get()
+    password = text_box2.get()
+
+    main_screen()
+
     account_password = password
 
     if username == "" and password == "":
@@ -166,16 +174,17 @@ def account_login(username,password):
     else :
         connect = sqlite3.connect("password_manager.db")
         cursor = connect.cursor()
-        cursor.execute("SELECT * FROM accounts WHERE username = ?", (username,))
+        cursor.execute("SELECT * FROM accounts WHERE username = ?", (username))
         account_name = cursor.fetchone()
         cursor.close()
         connect.close()
 
         if account_name:
-            account_id, account_username = account_name
+            account_id, account_username, account_password_hash = account_name
             
             passwords = get_passwords()
-            if passwords is None:
+            
+            if  not check_master_password():
                 print("Incorrect Password\n")
                 get_output()
             else :
@@ -193,7 +202,7 @@ def get_passwords():
     connect = sqlite3.connect("password_manager.db")
     cursor = connect.cursor()
 
-    cursor.execute("SELECT id, password FROM encrypted_passwords WHERE account_id = ?", (account_id,))
+    cursor.execute("SELECT id, password FROM encrypted_passwords WHERE account_id = ?", (account_id))
     passwords_data = cursor.fetchall()
 
     cursor.close()
@@ -204,9 +213,6 @@ def get_passwords():
         for data in passwords_data:
             id, encrypted_container = data
             decrypted_data = decrypt(encrypted_container)
-            
-            if decrypted_data is None:
-                return None
 
             container = PasswordContainer.deserialize(decrypted_data, id)
             passwords.append(container)
@@ -215,6 +221,12 @@ def get_passwords():
         get_output()
 
     return passwords
+
+def check_master_password():
+    if hash_master_password(account_password) == account_password_hash:
+        return True
+    else:
+        return False
     
 def change_username(container, new_username):
     container.change_username(new_username) 
@@ -232,6 +244,9 @@ def change_username(container, new_username):
     cursor.close()
     connect.close()
 
+    print("Username changed successfully\n")
+    get_output()
+
 def change_password(container, new_password):
     container.change_password(new_password) 
     id = container.get_id()
@@ -247,6 +262,9 @@ def change_password(container, new_password):
 
     cursor.close()
     connect.close()
+    
+    print("Password changed successfully\n")
+    get_output()
 
 def change_website(container, new_website):
     container.change_website(new_website) 
@@ -264,11 +282,57 @@ def change_website(container, new_website):
     cursor.close()
     connect.close()
 
+    print("Website changed successfully\n")
+    get_output()
+
 def add_password():
     
-
-def create_account():
     
+    
+    container = PasswordContainer(account_id, new_password, new_website, new_username)
+    encrypted_container = encrypt(container)
+
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO encrypted_passwords (account_id, password) VALUES (?, ?)", (account_id, encrypted_container))
+
+    conn.commit()
+
+    cursor.close()
+    connect.close()
+
+    print("Password container added successfully\n")
+    get_output()
+
+def create_account(text_box, text_box2):
+    
+    username = text_box.get()
+    master_password = text_box2.get()
+
+    hashed_password = hash_master_password(master_password)
+
+    connection = sqlite3.connect("password_manager.db")
+    cursor = connection.cursor()
+    try:
+        cursor.execute("INSERT INTO accounts (username, password_hash) VALUES (?, ?)", (username, hashed_password))
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        login_screen()
+
+        print("Account created successfully\n")
+        get_output()
+
+    except sqlite3.IntegrityError:
+        print("Username already exists. Please choose a different username\n")
+        get_output()
+
+def hash_master_password(master_password):
+    hashed_password = hashlib.sha256(master_password.encode()).hexdigest()
+    return hashed_password
 
 def get_output():
     output_text = output.getvalue().strip() + "\n"
@@ -276,13 +340,81 @@ def get_output():
     output.truncate(0)
     output.seek(0)
 
+def clear_frames():
+    for widget in root.winfo_children():
+        if widget is not text_widget:
+            widget.destroy()
+
+def login_screen():
+    clear_frames()
+
+    text_widget.delete()
+
+    login_frame = tk.Frame(root)
+    login_frame.pack()
+
+    label = tk.Label(login_frame, text="Login")
+    label.pack(padx=10, pady=10)
+
+    text_box = tk.Entry(login_frame, width=50, borderwidth=5)
+    text_box.insert(tk.END, "Enter Username")
+    text_box.pack()
+
+    text_box2 = tk.Entry(login_frame, width=50, borderwidth=5)
+    text_box2.insert(tk.END, "Enter Password")
+    text_box2.pack()
+
+    button = tk.Button(login_frame, text="Login", padx=10, pady=10, fg="white", bg="black", command= account_login(text_box, text_box2))
+    button.pack()
+
+    button2 = tk.Button(login_frame, text="Create Account", padx=10, pady=10, fg="white", bg="black", command= new_account_screen)
+    button2.pack()
+
+def new_account_screen():
+    clear_frames()
+
+    new_account_frame = tk.Frame(root)
+    new_account_frame.pack()
+
+    label = tk.Label(new_account_frame, text="Create Account")
+    label.pack(padx=10, pady=10)
+
+    text_box = tk.Entry(new_account_frame, width=50, borderwidth=5)
+    text_box.insert(tk.END, "Enter New Username")
+    text_box.pack()
+
+    text_box2 = tk.Entry(new_account_frame, width=50, borderwidth=5)
+    text_box2.insert(tk.END, "Enter New Password")
+    text_box2.pack()
+
+    button = tk.Button(new_account_frame, text="Login", padx=10, pady=10, fg="white", bg="black", command= create_account(text_box, text_box2))
+    button.pack()
+    
+
+def main_screen():
+    clear_frames()
+    
+    main_frame = tk.Frame(root)
+    main_frame.pack()
+
+    label = tk.Label(main_frame, text="Main Screen")
+    label.pack(padx=10, pady=10)
+
+    button = tk.Button(main_frame, text="Login", padx=10, pady=10, fg="white", bg="black", command= )
+    button.pack()
+
+    button2 = tk.Button(main_frame, text="Create Account", padx=10, pady=10, fg="white", bg="black", command= )
+    button2.pack()
+    
+
 connect = sqlite3.connect("password_manager.db")
 cursor = connect.cursor()
 
 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS accounts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL
+                    username TEXT NOT NULL,
+                    password_hash TEXT NOT NULL
                 )
                 """)
 
@@ -290,7 +422,7 @@ cursor.execute("""
                 CREATE TABLE IF NOT EXISTS encrypted_passwords (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     account_id INTEGER NOT NULL,
-                    password BLOB NOT NULL,
+                    password BLOB NOT NULL
                 )
                 """)
 
@@ -301,32 +433,12 @@ connect.close()
 output = StringIO()
 sys.stdout = output
 
-window = tk.Tk()
+root = tk.Tk()
+root.title("Password Manager")
 
-label = tk.Label(text="Password Manager", font=("Arial", 20))
-label.pack()
+text_widget = tk.Text(root)
+text_widget.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-text_box = tk.Entry(window, width=50, borderwidth=5)
-text_box.insert(tk.END, "Enter Username")
-text_box.pack()
+login_screen()
 
-text_box2 = tk.Entry(window, width=50, borderwidth=5)
-text_box2.insert(tk.END, "Enter Password")
-text_box2.pack()
-
-button = tk.Button(window, text="Enter", padx=10, pady=5, fg="white", bg="black", command= get_path)
-button.pack()
-
-button2 = tk.Button(window, text="Encrypt", padx=10, pady=5, fg="white", bg="black", command= is_encrypt)
-button2.pack()
-
-button3 = tk.Button(window, text="Decrypt", padx=10, pady=5, fg="white", bg="black", command= is_decrypt)
-button3.pack()
-
-button5 = tk.Button(window, text="Start Program", padx=10, pady=5, fg="white", bg="black", command= start)
-button5.pack()
-
-text_widget = tk.Text(window)
-text_widget.pack()
-
-window.mainloop()
+root.mainloop()
