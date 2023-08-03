@@ -59,10 +59,10 @@ def generate_password(length = 12):
     characters = string.ascii_letters + string.digits + string.punctuation
 
     password = []
-    password.append(string.ascii_lowercase)
-    password.append(string.ascii_uppercase)
-    password.append(string.digits)
-    password.append(string.punctuation)
+    password.append(random.choice(string.ascii_lowercase))
+    password.append(random.choice(string.ascii_uppercase))
+    password.append(random.choice(string.digits))
+    password.append(random.choice(string.punctuation))
 
     for i in range(length - 4):
         password.append(random.choice(characters))
@@ -71,12 +71,15 @@ def generate_password(length = 12):
 
     password = "".join(password)
 
-    return password
+    print(password + "\n-\n")
+    get_output()
 
-def rate_password(password):
+def rate_password(text_box):
+    password = text_box.get().strip()
+    
     score = 0
 
-    length_score = min(len(password) / 4, 4.0)
+    length_score = min(len(password) / 3, 4.0)
     score += length_score
 
     if any(char.isdigit() for char in password):
@@ -103,7 +106,8 @@ def rate_password(password):
     else:
         strength = "Very Weak"
 
-    return strength + "\n" + "Score: " + str(score) + "/10.0\n-\n"
+    print(strength + "\n" + "Score: " + str(score) + "/10.0\n-\n")
+    get_output()
 
 def generate_key(password, salt):
     if isinstance(password, str):
@@ -423,11 +427,23 @@ def main_screen():
     label = tk.Label(main_frame, text="Main Screen")
     label.pack(padx=10, pady=10)
 
+    text_box = tk.Entry(main_frame, width=50, borderwidth=5)
+    text_box.insert(tk.END, "Enter Password to check strength")
+    text_box.pack()
+
+    button3 = tk.Button(main_frame, text="Check Strength", padx=10, pady=10, fg="white", bg="black", command= lambda: rate_password(text_box))
+    button3.pack()
+
+    button4 = tk.Button(main_frame, text="Generate Strong Password", padx=10, pady=10, fg="white", bg="black", command= generate_password)
+    button4.pack()
+
     button = tk.Button(main_frame, text="Add Password", padx=10, pady=10, fg="white", bg="black", command= add_password_screen)
     button.pack()
 
     button2 = tk.Button(main_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
     button2.pack()
+
+
     
 def add_password_screen():
     clear_frames()
