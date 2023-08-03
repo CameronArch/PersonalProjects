@@ -1,12 +1,11 @@
 import base64
 import hashlib
 from io import StringIO
-import os
 import sys
 import tkinter as tk
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.fernet import Fernet
 import json
 import random
 import string
@@ -20,7 +19,7 @@ class PasswordContainer:
         self.username = username
 
     def __str__(self):
-        return f"Website: {self.website}\nUsername: {self.username}\nPassword: {self.password}\n-\n"
+        return f"Container ID: {self.container_id}\nWebsite: {self.website}\nUsername: {self.username}\nPassword: {self.password}\n-\n"
 
     def change_password(self, new_password):
         self.password = new_password
@@ -163,13 +162,13 @@ def account_login(text_box, text_box2):
     account_password = password
 
     if username == "" and password == "":
-        print("Enter a valid Username and Password\n-\n")
+        print("Enter a Valid Username and Password\n-\n")
         get_output()
     elif username == "":
-        print("Enter a valid Username\n-\n")
+        print("Enter a Valid Username\n-\n")
         get_output()
     elif password == "":
-        print("Enter a valid Password\n-\n")
+        print("Enter a Valid Password\n-\n")
         get_output()
     else :
         connect = sqlite3.connect("password_manager.db")
@@ -198,7 +197,7 @@ def account_login(text_box, text_box2):
                     print(str(container))
                     get_output()
         else :
-            print("Account does not exist\n-\n")
+            print("Account Does Not Exist\n-\n")
             get_output()
 
 def get_passwords():
@@ -221,7 +220,7 @@ def get_passwords():
             container = PasswordContainer.deserialize(decrypted_data, container_id)
             passwords.append(container)
     else :
-        print("No passwords contained in account\n-\n")
+        print("No Passwords Contained in Account\n-\n")
         get_output()
 
     return passwords
@@ -232,62 +231,146 @@ def check_master_password():
     else:
         return False
     
-def change_username(container, new_username):
-    container.change_username(new_username) 
-    container_id = container.get_id()
-
-    encrypted_container = encrypt(container)
-
-    conn = sqlite3.connect("password_manager.db")
-    cursor = conn.cursor()
-
-    cursor.execute("UPDATE passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
-
-    conn.commit()
-
-    cursor.close()
-    connect.close()
-
-    print("Username changed successfully\n-\n")
-    get_output()
-
-def change_password(container, new_password):
-    container.change_password(new_password) 
-    container_id = container.get_id()
-
-    encrypted_container = encrypt(container)
-
-    conn = sqlite3.connect("password_manager.db")
-    cursor = conn.cursor()
-
-    cursor.execute("UPDATE passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
-
-    conn.commit()
-
-    cursor.close()
-    connect.close()
+def change_username(text_box2, text_box3):
+    container_id = text_box2.get().strip()
+    new_username = text_box3.get().strip()
     
-    print("Password changed successfully\n-\n")
-    get_output()
-
-def change_website(container, new_website):
-    container.change_website(new_website) 
-    container_id = container.get_id()
-
-    encrypted_container = encrypt(container)
-
     conn = sqlite3.connect("password_manager.db")
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ?", (container_id,))
 
-    conn.commit()
+    password_data = cursor.fetchone()
 
     cursor.close()
     connect.close()
 
-    print("Website changed successfully\n-\n")
-    get_output()
+    if password_data:
+        encrypted_container = password_data[0]
+        decrypted_data = decrypt(encrypted_container)
+        
+        container = PasswordContainer.deserialize(decrypted_data, container_id)
+        container.change_username(new_username)
+
+        encrypted_container = encrypt(container)
+
+        conn = sqlite3.connect("password_manager.db")
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+
+        conn.commit()
+
+        cursor.close()
+        connect.close()
+        
+        text_widget.delete("1.0", tk.END)
+
+        passwords = get_passwords()
+        for container in passwords:
+            print(str(container))
+            get_output()
+
+        print("Username Changed Successfully\n-\n")
+        get_output()
+
+    else :
+        print("Container ID Does Not Exist\n-\n")
+        get_output()
+
+def change_password(text_box2, text_box3):
+    container_id = text_box2.get().strip()
+    new_password = text_box3.get().strip()
+    
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ?", (container_id,))
+
+    password_data = cursor.fetchone()
+
+    cursor.close()
+    connect.close()
+
+    if password_data:
+        encrypted_container = password_data[0]
+        decrypted_data = decrypt(encrypted_container)
+        
+        container = PasswordContainer.deserialize(decrypted_data, container_id)
+        container.change_password(new_password)
+
+        encrypted_container = encrypt(container)
+
+        conn = sqlite3.connect("password_manager.db")
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+
+        conn.commit()
+
+        cursor.close()
+        connect.close()
+        
+        text_widget.delete("1.0", tk.END)
+
+        passwords = get_passwords()
+        for container in passwords:
+            print(str(container))
+            get_output()
+
+        print("Password Changed Successfully\n-\n")
+        get_output()
+
+    else :
+        print("Container ID Does Not Exist\n-\n")
+        get_output()
+
+def change_website(text_box2, text_box3):
+    container_id = text_box2.get().strip()
+    new_website = text_box3.get().strip()
+    
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ?", (container_id,))
+
+    password_data = cursor.fetchone()
+
+    cursor.close()
+    connect.close()
+
+    if password_data:
+        encrypted_container = password_data[0]
+        decrypted_data = decrypt(encrypted_container)
+        
+        container = PasswordContainer.deserialize(decrypted_data, container_id)
+        container.change_website(new_website)
+
+        encrypted_container = encrypt(container)
+
+        conn = sqlite3.connect("password_manager.db")
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+
+        conn.commit()
+
+        cursor.close()
+        connect.close()
+        
+        text_widget.delete("1.0", tk.END)
+
+        passwords = get_passwords()
+        for container in passwords:
+            print(str(container))
+            get_output()
+
+        print("Website Changed Successfully\n-\n")
+        get_output()
+
+    else :
+        print("Container ID Does Not Exist\n-\n")
+        get_output()
 
 def add_password(text_box, text_box2, text_box3):
     new_website = text_box.get().strip()
@@ -439,6 +522,23 @@ def main_screen():
 
     button = tk.Button(main_frame, text="Add Password", padx=10, pady=10, fg="white", bg="black", command= add_password_screen)
     button.pack()
+
+    text_box2 = tk.Entry(main_frame, width=50, borderwidth=5)
+    text_box2.insert(tk.END, "Enter Container ID Receiving Changes")
+    text_box2.pack()
+    
+    text_box3 = tk.Entry(main_frame, width=50, borderwidth=5)
+    text_box3.insert(tk.END, "Enter New Website, Username, or Password")
+    text_box3.pack()
+
+    button5 = tk.Button(main_frame, text="Change Website", padx=10, pady=10, fg="white", bg="black", command= lambda: change_website(text_box2, text_box3))
+    button5.pack()
+
+    button6 = tk.Button(main_frame, text="Change Username", padx=10, pady=10, fg="white", bg="black", command= lambda: change_username(text_box2, text_box3))
+    button6.pack()
+
+    button7 = tk.Button(main_frame, text="Change Password", padx=10, pady=10, fg="white", bg="black", command= lambda: change_password(text_box2, text_box3))
+    button7.pack()
 
     button2 = tk.Button(main_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
     button2.pack()
