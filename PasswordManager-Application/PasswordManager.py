@@ -232,7 +232,7 @@ def change_username(text_box2, text_box3):
     conn = sqlite3.connect("password_manager.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ?", (container_id,))
+    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ? AND account_id = ?", (container_id, account_id))
 
     password_data = cursor.fetchone()
 
@@ -251,7 +251,7 @@ def change_username(text_box2, text_box3):
         conn = sqlite3.connect("password_manager.db")
         cursor = conn.cursor()
 
-        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ? AND account_id = ?", (encrypted_container, container_id, account_id))
 
         conn.commit()
 
@@ -279,7 +279,7 @@ def change_password(text_box2, text_box3):
     conn = sqlite3.connect("password_manager.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ?", (container_id,))
+    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ? AND account_id = ?", (container_id, account_id))
 
     password_data = cursor.fetchone()
 
@@ -298,7 +298,7 @@ def change_password(text_box2, text_box3):
         conn = sqlite3.connect("password_manager.db")
         cursor = conn.cursor()
 
-        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ? AND account_id = ?", (encrypted_container, container_id, account_id))
 
         conn.commit()
 
@@ -326,7 +326,7 @@ def change_website(text_box2, text_box3):
     conn = sqlite3.connect("password_manager.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ?", (container_id,))
+    cursor.execute("SELECT password FROM encrypted_passwords WHERE id = ? AND account_id = ?", (container_id, account_id))
 
     password_data = cursor.fetchone()
 
@@ -345,7 +345,7 @@ def change_website(text_box2, text_box3):
         conn = sqlite3.connect("password_manager.db")
         cursor = conn.cursor()
 
-        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ? AND account_id = ?", (encrypted_container, container_id, account_id))
 
         conn.commit()
 
@@ -360,6 +360,38 @@ def change_website(text_box2, text_box3):
             get_output()
 
         print("Website Changed Successfully\n-\n")
+        get_output()
+
+    else :
+        print("Container ID Does Not Exist\n-\n")
+        get_output()
+
+def remove_container(text_box2):
+    container_id = text_box2.get().strip()
+    
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM encrypted_passwords WHERE id = ? AND account_id = ?", (container_id, account_id))
+    container = cursor.fetchone()
+
+    if container:
+        cursor.execute("DELETE FROM encrypted_passwords WHERE id = ? AND account_id = ?", (container_id, account_id))
+
+        conn.commit()
+
+        cursor.close()
+        connect.close()
+
+        text_widget.delete("1.0", tk.END)
+
+        passwords = get_passwords()
+    
+        for container in passwords:
+            print(str(container))
+            get_output()
+
+        print("Container Removed Successfully\n-\n")
         get_output()
 
     else :
@@ -508,7 +540,24 @@ def change_account_password(text_box3):
 
     return_to_main()
 
-    print("Account Username Changed Successfully\n-\n")
+    print("Account Password Changed Successfully\n-\n")
+    get_output()
+
+def delete_account():
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM accounts WHERE id = ?", (account_id,))
+    cursor.execute("DELETE FROM encrypted_passwords WHERE account_id = ?", (account_id,))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    login_screen()
+
+    print("Account Deleted Successfully\n-\n")
     get_output()
 
 def get_output():
@@ -622,6 +671,9 @@ def main_screen():
     button7 = tk.Button(main_frame, text="Change Password", padx=10, pady=10, fg="white", bg="black", command= lambda: change_password(text_box2, text_box3))
     button7.pack(side=tk.LEFT, padx=5, pady=5)
 
+    button8 = tk.Button(main_frame, text="Remove Container", padx=10, pady=10, fg="white", bg="black", command= lambda: remove_container(text_box2))
+    button8.pack(side=tk.LEFT, padx=5, pady=5)
+
     center_frame = tk.Frame(root)
     center_frame.pack()
 
@@ -654,6 +706,9 @@ def edit_screen():
 
     button2 = tk.Button(edit_frame, text="Change Account Password", padx=10, pady=10, fg="white", bg="black", command= lambda: change_account_password(text_box3))
     button2.pack(side=tk.TOP, padx=5, pady=5)
+
+    button4 = tk.Button(edit_frame, text="Delete Account", padx=10, pady=10, fg="white", bg="black", command= delete_account)
+    button4.pack(side=tk.TOP, padx=5, pady=5)
 
     button3 = tk.Button(edit_frame, text="Return to Main Screen", padx=10, pady=10, fg="white", bg="black", command= return_to_main)
     button3.pack(side=tk.TOP, padx=5, pady=5)
