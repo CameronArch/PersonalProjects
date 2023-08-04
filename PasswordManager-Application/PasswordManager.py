@@ -70,7 +70,7 @@ def generate_password(length = 12):
 
     password = "".join(password)
 
-    print(password + "\n-\n")
+    print("Generated Password: " + password + "\n-\n")
     get_output()
 
 def rate_password(text_box):
@@ -131,9 +131,6 @@ def encrypt(container):
 
     encrypted = fernet.encrypt(container.serialize())
 
-    print("Encryption Successful\n-\n")
-    get_output()
-
     return encrypted
 
 def decrypt(encrypted_data):
@@ -143,9 +140,6 @@ def decrypt(encrypted_data):
     fernet = Fernet(key)
       
     decrypted = fernet.decrypt(encrypted_data)
-
-    print("Decryption Successful\n-\n")
-    get_output()
 
     return decrypted
 
@@ -415,7 +409,7 @@ def create_account(text_box, text_box2):
 
         connection = sqlite3.connect("password_manager.db")
         cursor = connection.cursor()
-        try:
+        if not account_exists(username):
             cursor.execute("INSERT INTO accounts (username, password_hash) VALUES (?, ?)", (username, hashed_password))
             connection.commit()
 
@@ -427,13 +421,95 @@ def create_account(text_box, text_box2):
             print("Account created successfully\n-\n")
             get_output()
 
-        except sqlite3.IntegrityError:
+        else :
             print("Username already exists. Please choose a different username\n-\n")
             get_output()
 
+def account_exists(username):
+    connect = sqlite3.connect("password_manager.db")
+    cursor = connect.cursor()
+
+    cursor.execute("SELECT * FROM accounts WHERE username = ?", (username,))
+    account_name = cursor.fetchone()
+
+    cursor.close()
+    connect.close()
+
+    return bool(account_name)
+    
 def hash_master_password(master_password):
     hashed_password = hashlib.sha256(master_password.encode()).hexdigest()
     return hashed_password
+
+def change_account_username(text_box2):
+    global account_username
+    
+    new_account_username = text_box2.get().strip()
+
+    if account_exists(new_account_username):
+        print("Username already exists. Please choose a different username\n-\n")
+        get_output()
+
+    else :
+        conn = sqlite3.connect("password_manager.db")
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE accounts SET username = ? WHERE id = ?", (new_account_username, account_id))
+
+        conn.commit()
+    
+        passwords = get_passwords()
+        account_username = new_account_username
+
+        for container in passwords:
+            container_id = container.get_id()
+            encrypted_container = encrypt(container)
+
+            cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+
+            conn.commit()
+
+        cursor.close()
+        connect.close()
+
+        return_to_main()
+
+        print("Account Username Changed Successfully\n-\n")
+        get_output()
+
+def change_account_password(text_box3):
+    global account_password
+    global account_password_hash
+    
+    new_account_password = text_box3.get().strip()
+
+    account_password_hash = hash_master_password(new_account_password)
+
+    conn = sqlite3.connect("password_manager.db")
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE accounts SET password_hash = ? WHERE id = ?", (account_password_hash, account_id))
+
+    conn.commit()
+
+    passwords = get_passwords()
+    account_password = new_account_password
+
+    for container in passwords:
+        container_id = container.get_id()
+        encrypted_container = encrypt(container)
+
+        cursor.execute("UPDATE encrypted_passwords SET password = ? WHERE id = ?", (encrypted_container, container_id))
+
+        conn.commit()
+
+    cursor.close()
+    connect.close()
+
+    return_to_main()
+
+    print("Account Username Changed Successfully\n-\n")
+    get_output()
 
 def get_output():
     output_text = output.getvalue().strip() + "\n"
@@ -445,13 +521,17 @@ def clear_frames():
     for widget in root.winfo_children():
         if widget is not text_widget:
             widget.destroy()
-    
-    text_widget.delete("1.0", tk.END)
-    
 
 def login_screen():
+    global account_id
+    global account_username
+    global account_password
+    global account_password_hash
+    global passwords
+
     clear_frames()
-    
+    text_widget.delete("1.0", tk.END)
+
     account_id = None
     account_username = None
     account_password = None
@@ -473,13 +553,14 @@ def login_screen():
     text_box2.pack()
 
     button = tk.Button(login_frame, text="Login", padx=10, pady=10, fg="white", bg="black", command= lambda: account_login(text_box, text_box2))
-    button.pack()
+    button.pack(side=tk.TOP, padx=5, pady=5)
 
     button2 = tk.Button(login_frame, text="Create Account", padx=10, pady=10, fg="white", bg="black", command= new_account_screen)
-    button2.pack()
+    button2.pack(side=tk.TOP, padx=5, pady=5)
 
 def new_account_screen():
     clear_frames()
+    text_widget.delete("1.0", tk.END)
 
     new_account_frame = tk.Frame(root)
     new_account_frame.pack()
@@ -496,13 +577,14 @@ def new_account_screen():
     text_box2.pack()
 
     button = tk.Button(new_account_frame, text="Create Account", padx=10, pady=10, fg="white", bg="black", command= lambda: create_account(text_box, text_box2))
-    button.pack()
+    button.pack(side=tk.TOP, padx=5, pady=5)
 
     button2 = tk.Button(new_account_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
-    button2.pack()
+    button2.pack(side=tk.TOP, padx=5, pady=5)
     
 def main_screen():
     clear_frames()
+    text_widget.delete("1.0", tk.END)
     
     main_frame = tk.Frame(root)
     main_frame.pack()
@@ -515,16 +597,16 @@ def main_screen():
     text_box.pack()
 
     button3 = tk.Button(main_frame, text="Check Strength", padx=10, pady=10, fg="white", bg="black", command= lambda: rate_password(text_box))
-    button3.pack()
+    button3.pack(side=tk.TOP, padx=5, pady=5)
 
     button4 = tk.Button(main_frame, text="Generate Strong Password", padx=10, pady=10, fg="white", bg="black", command= generate_password)
-    button4.pack()
+    button4.pack(side=tk.TOP, padx=5, pady=5)
 
     button = tk.Button(main_frame, text="Add Password", padx=10, pady=10, fg="white", bg="black", command= add_password_screen)
-    button.pack()
+    button.pack(side=tk.TOP, padx=5, pady=5)
 
     text_box2 = tk.Entry(main_frame, width=50, borderwidth=5)
-    text_box2.insert(tk.END, "Enter Container ID Receiving Changes")
+    text_box2.insert(tk.END, "Enter ID of Container Receiving Changes")
     text_box2.pack()
     
     text_box3 = tk.Entry(main_frame, width=50, borderwidth=5)
@@ -532,19 +614,50 @@ def main_screen():
     text_box3.pack()
 
     button5 = tk.Button(main_frame, text="Change Website", padx=10, pady=10, fg="white", bg="black", command= lambda: change_website(text_box2, text_box3))
-    button5.pack()
+    button5.pack(side=tk.LEFT, padx=5, pady=5)
 
     button6 = tk.Button(main_frame, text="Change Username", padx=10, pady=10, fg="white", bg="black", command= lambda: change_username(text_box2, text_box3))
-    button6.pack()
+    button6.pack(side=tk.LEFT, padx=5, pady=5)
 
     button7 = tk.Button(main_frame, text="Change Password", padx=10, pady=10, fg="white", bg="black", command= lambda: change_password(text_box2, text_box3))
-    button7.pack()
+    button7.pack(side=tk.LEFT, padx=5, pady=5)
 
-    button2 = tk.Button(main_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
-    button2.pack()
+    center_frame = tk.Frame(root)
+    center_frame.pack()
 
+    button9 = tk.Button(center_frame, text="Edit Account", padx=10, pady=10, fg="white", bg="black", command= edit_screen)
+    button9.pack(side=tk.TOP, padx=5, pady=5)
 
+    button2 = tk.Button(center_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
+    button2.pack(side=tk.TOP, padx=5, pady=5)
+
+def edit_screen():
+    clear_frames()
+    text_widget.delete("1.0", tk.END)
+
+    edit_frame = tk.Frame(root)
+    edit_frame.pack()
+
+    label = tk.Label(edit_frame, text="Edit Account")
+    label.pack(padx=10, pady=10)
+
+    text_box2 = tk.Entry(edit_frame, width=50, borderwidth=5)
+    text_box2.insert(tk.END, "Enter New Account Username")
+    text_box2.pack()
     
+    button = tk.Button(edit_frame, text="Change Account Username", padx=10, pady=10, fg="white", bg="black", command= lambda: change_account_username(text_box2))
+    button.pack(side=tk.TOP, padx=5, pady=5)
+
+    text_box3 = tk.Entry(edit_frame, width=50, borderwidth=5)
+    text_box3.insert(tk.END, "Enter New Account Password")
+    text_box3.pack()
+
+    button2 = tk.Button(edit_frame, text="Change Account Password", padx=10, pady=10, fg="white", bg="black", command= lambda: change_account_password(text_box3))
+    button2.pack(side=tk.TOP, padx=5, pady=5)
+
+    button3 = tk.Button(edit_frame, text="Return to Main Screen", padx=10, pady=10, fg="white", bg="black", command= return_to_main)
+    button3.pack(side=tk.TOP, padx=5, pady=5)
+
 def add_password_screen():
     clear_frames()
 
@@ -567,10 +680,10 @@ def add_password_screen():
     text_box3.pack()
 
     button = tk.Button(add_frame, text="Add Password", padx=10, pady=10, fg="white", bg="black", command= lambda: add_password(text_box, text_box2, text_box3))
-    button.pack()
+    button.pack(side=tk.TOP, padx=5, pady=5)
 
     button2 = tk.Button(add_frame, text="Return to Main Screen", padx=10, pady=10, fg="white", bg="black", command= return_to_main)
-    button2.pack()
+    button2.pack(side=tk.TOP, padx=5, pady=5)
 
 def return_to_main():
     main_screen()
