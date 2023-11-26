@@ -678,10 +678,10 @@ def main_screen():
     center_frame.pack()
 
     button9 = tk.Button(center_frame, text="Edit Account", padx=10, pady=10, fg="white", bg="black", command= edit_screen)
-    button9.pack(side=tk.TOP, padx=5, pady=5)
+    button9.pack(side=tk.LEFT, padx=5, pady=5)
 
     button2 = tk.Button(center_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
-    button2.pack(side=tk.TOP, padx=5, pady=5)
+    button2.pack(side=tk.LEFT, padx=5, pady=5)
 
 def edit_screen():
     clear_frames()
