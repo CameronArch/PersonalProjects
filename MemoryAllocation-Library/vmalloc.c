@@ -112,10 +112,6 @@ void *vmalloc(size_t size, void **var) {
 			goto Lswapped;
 		}
 		
-		
-		//Add swapping when all blocks smaller than size; check free blocks too when checking
-		//consequtive blocks
-		
 		best_block = heapstart;
 		size_t free_size = 0;
 		struct block_header *following_block = heapstart;
