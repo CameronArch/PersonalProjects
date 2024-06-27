@@ -9,51 +9,134 @@ from cryptography.fernet import Fernet
 import json
 import random
 import string
-import sqlite3   
+import sqlite3
 
+'''
+Container class to store data associated with a given password.
+
+Member Variables:
+container_id - The unique identifier for the container.
+password - The password associated and stored in the container.
+website - The website associated with the password.
+username - The username associated with the password.
+'''
 class PasswordContainer:
+    '''
+    Class constuctor to initialize the container object.
+
+    @param container_id The unique identifier for the container.
+    @param password The password associated and stored in the container.
+    @param website The website associated with the password.
+    @param username The username associated with the password.
+    '''
     def __init__(self, container_id, password, website, username):
         self.container_id = container_id
         self.password = password
         self.website = website
         self.username = username
 
+    '''
+    Creates string representation of the container object.
+
+    @return The string representation of the container object.
+    '''
     def __str__(self):
         return f"Container ID: {self.container_id}\nWebsite: {self.website}\nUsername: {self.username}\nPassword: {self.password}\n-\n"
 
+    '''
+    Changes the password stored in the container.
+
+    @param new_password The new password to store in the container.
+    '''
     def change_password(self, new_password):
         self.password = new_password
     
+    '''
+    Changes the username stored in the container.
+
+    @param new_username The new username to store in the container.
+    '''
     def change_username(self, new_username):
         self.username = new_username
     
+    '''
+    Changes the website stored in the container.
+
+    @param new_website The new website to store in the container.
+    '''
     def change_website(self, new_website):
         self.website = new_website
 
+    '''
+    Changes the container ID.
+
+    @param new_id The new container ID.
+    '''
     def change_id(self, new_id):
         self.container_id = new_id
 
+    '''
+    Gets the container ID.
+
+    @return The container ID.
+    '''
     def get_id(self):
         return self.container_id
     
+    '''
+    Gets the password stored in the container.
+
+    @return The password stored in the container.
+    '''
     def get_password(self):
         return self.password
     
+    '''
+    Gets the username stored in the container.
+    
+    @return The username stored in the container.
+    '''
     def get_username(self):
         return self.username
+    '''
+    Gets the website stored in the container.
     
+    @return The website stored in the container.
+    '''
     def get_website(self):
         return self.website
+    '''
+    Serializes the container object by converting it to a JSON string
+    and then encoding it into bytes.
     
+    @return The serialized container object.
+    '''
     def serialize(self):
         return json.dumps(self.__dict__).encode()
     
+    '''
+    Deserializes the container object by converting bytes back 
+    to a JSON string and then reconstructing the container object
+    with a new id.
+
+    @param data The serialized container object.
+    @param container_id The new container ID.
+    
+    @return The deserialized container object.
+    '''
     @classmethod
     def deserialize(cls, data, container_id):
         container = cls(**json.loads(data.decode()))
         container.change_id(container_id)
         return container
     
+    '''
+    Generates a random password of a given length.
+    
+    @param length The length of the password to generate.
+    
+    @return The generated password.
+    '''
 def generate_password(length = 12):
     characters = string.ascii_letters + string.digits + string.punctuation
 
@@ -72,7 +155,14 @@ def generate_password(length = 12):
 
     print("Generated Password: " + password + "\n-\n")
     get_output()
+'''
+Rates the strength of a given password based on a scoring system
+based on unique characters, length, and types of characters.
 
+@param text_box The text box containing the password to rate.
+
+@return The strength of the password.
+'''
 def rate_password(text_box):
     password = text_box.get().strip()
     
@@ -108,6 +198,14 @@ def rate_password(text_box):
     print(strength + "\n" + "Score: " + str(score) + "/10.0\n-\n")
     get_output()
 
+'''
+Generates a key based on a given password and salt for encryption.
+
+@param password The password to generate the key from.
+@param salt The salt to use in generating the key.
+
+@return The generated key.
+'''
 def generate_key(password, salt):
     if isinstance(password, str):
         password = password.encode()
@@ -123,6 +221,13 @@ def generate_key(password, salt):
 
     return(kdf.derive(password)) 
 
+'''
+Encrypts a given container object using Fernet symmetric key encryption.
+
+@param container The container object to encrypt.
+
+@return The encrypted container object.
+'''
 def encrypt(container):
     salt = hashlib.sha256(account_username.encode()).digest()
     
@@ -133,6 +238,13 @@ def encrypt(container):
 
     return encrypted
 
+'''
+Decrypts a given encrypted container object using Fernet symmetric key encryption.
+
+@param encrypted_data The encrypted container object to decrypt.
+
+@return The decrypted container object.
+'''
 def decrypt(encrypted_data):
     salt = hashlib.sha256(account_username.encode()).digest()
 
@@ -143,6 +255,12 @@ def decrypt(encrypted_data):
 
     return decrypted
 
+'''
+Logs into an account using a given username and password.
+
+@param text_box The text box containing the username.
+@param text_box2 The text box containing the password.
+'''
 def account_login(text_box, text_box2):
     global account_id
     global account_username
@@ -194,6 +312,10 @@ def account_login(text_box, text_box2):
             print("Account Does Not Exist\n-\n")
             get_output()
 
+'''
+Gets the password containers associated with an account.
+
+@return The list of containers associated with the account.'''
 def get_passwords():
     connect = sqlite3.connect("password_manager.db")
     cursor = connect.cursor()
@@ -219,12 +341,22 @@ def get_passwords():
 
     return passwords
 
+'''
+Checks the inputted account password with the actual account password.
+
+@return True if the passwords match, False otherwise.'''
 def check_master_password():
     if hash_master_password(account_password) == account_password_hash:
         return True
     else:
         return False
-    
+
+'''
+Changes the username of a given container for an account.
+
+@param text_box2 The text box containing the container ID.
+@param text_box3 The text box containing the new username.
+'''    
 def change_username(text_box2, text_box3):
     container_id = text_box2.get().strip()
     new_username = text_box3.get().strip()
@@ -272,6 +404,12 @@ def change_username(text_box2, text_box3):
         print("Container ID Does Not Exist\n-\n")
         get_output()
 
+'''
+Changes the password of a given container for an account.
+
+@param text_box2 The text box containing the container ID.
+@param text_box3 The text box containing the new password.
+'''
 def change_password(text_box2, text_box3):
     container_id = text_box2.get().strip()
     new_password = text_box3.get().strip()
@@ -319,6 +457,12 @@ def change_password(text_box2, text_box3):
         print("Container ID Does Not Exist\n-\n")
         get_output()
 
+'''
+Changes the website of a given container for an account.
+
+@param text_box2 The text box containing the container ID.
+@param text_box3 The text box containing the new website.
+'''
 def change_website(text_box2, text_box3):
     container_id = text_box2.get().strip()
     new_website = text_box3.get().strip()
@@ -366,6 +510,11 @@ def change_website(text_box2, text_box3):
         print("Container ID Does Not Exist\n-\n")
         get_output()
 
+'''
+Removes a password container from an account.
+
+@param text_box2 The text box containing the container ID.
+'''
 def remove_container(text_box2):
     container_id = text_box2.get().strip()
     
@@ -398,6 +547,13 @@ def remove_container(text_box2):
         print("Container ID Does Not Exist\n-\n")
         get_output()
 
+'''
+Adds a password container to an account.
+
+@param text_box The text box containing the website.
+@param text_box2 The text box containing the username.
+@param text_box3 The text box containing the password.
+'''
 def add_password(text_box, text_box2, text_box3):
     new_website = text_box.get().strip()
     new_username = text_box2.get().strip()
@@ -421,6 +577,12 @@ def add_password(text_box, text_box2, text_box3):
     print("Password container added successfully\n-\n")
     get_output()
 
+'''
+Creates an account with a given username and password.
+
+@param text_box The text box containing the username.
+@param text_box2 The text box containing the password.
+'''
 def create_account(text_box, text_box2):
     
     username = text_box.get().strip()
@@ -457,6 +619,13 @@ def create_account(text_box, text_box2):
             print("Username already exists. Please choose a different username\n-\n")
             get_output()
 
+'''
+Checks if an account exists with a given username.
+
+@param username The username to check.
+
+@return True if the account exists, False otherwise.
+'''
 def account_exists(username):
     connect = sqlite3.connect("password_manager.db")
     cursor = connect.cursor()
@@ -468,7 +637,14 @@ def account_exists(username):
     connect.close()
 
     return bool(account_name)
-    
+
+'''
+Hashes a given password using SHA-256.
+
+@param master_password The password to hash.
+
+@return The hashed password.
+'''    
 def hash_master_password(master_password):
     hashed_password = hashlib.sha256(master_password.encode()).hexdigest()
     return hashed_password
@@ -509,6 +685,11 @@ def change_account_username(text_box2):
         print("Account Username Changed Successfully\n-\n")
         get_output()
 
+'''
+Changes the password of an account.
+
+@param text_box3 The text box containing the new password.
+'''
 def change_account_password(text_box3):
     global account_password
     global account_password_hash
@@ -543,6 +724,9 @@ def change_account_password(text_box3):
     print("Account Password Changed Successfully\n-\n")
     get_output()
 
+'''
+Deletes an account.
+'''
 def delete_account():
     conn = sqlite3.connect("password_manager.db")
     cursor = conn.cursor()
@@ -560,17 +744,26 @@ def delete_account():
     print("Account Deleted Successfully\n-\n")
     get_output()
 
+'''
+Flushes output buffer stream to text widget.
+'''
 def get_output():
     output_text = output.getvalue().strip() + "\n"
     text_widget.insert(tk.END, output_text)
     output.truncate(0)
     output.seek(0)
 
+'''
+Clears all frames in the root window.
+'''
 def clear_frames():
     for widget in root.winfo_children():
         if widget is not text_widget:
             widget.destroy()
 
+'''
+Initializes the login screen.
+'''
 def login_screen():
     global account_id
     global account_username
@@ -607,6 +800,9 @@ def login_screen():
     button2 = tk.Button(login_frame, text="Create Account", padx=10, pady=10, fg="white", bg="black", command= new_account_screen)
     button2.pack(side=tk.TOP, padx=5, pady=5)
 
+'''
+Initializes the new account screen for creating an account.
+'''
 def new_account_screen():
     clear_frames()
     text_widget.delete("1.0", tk.END)
@@ -630,7 +826,10 @@ def new_account_screen():
 
     button2 = tk.Button(new_account_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
     button2.pack(side=tk.TOP, padx=5, pady=5)
-    
+
+'''
+Initializes the main screen where passwords will be displayed for account.
+'''    
 def main_screen():
     clear_frames()
     text_widget.delete("1.0", tk.END)
@@ -683,6 +882,9 @@ def main_screen():
     button2 = tk.Button(center_frame, text="Return to Login", padx=10, pady=10, fg="white", bg="black", command= login_screen)
     button2.pack(side=tk.LEFT, padx=5, pady=5)
 
+'''
+Initializes the edit screen for changing account's data.
+'''
 def edit_screen():
     clear_frames()
     text_widget.delete("1.0", tk.END)
@@ -713,6 +915,9 @@ def edit_screen():
     button3 = tk.Button(edit_frame, text="Return to Main Screen", padx=10, pady=10, fg="white", bg="black", command= return_to_main)
     button3.pack(side=tk.TOP, padx=5, pady=5)
 
+'''
+Initializes the add password screen for adding a password container.
+'''
 def add_password_screen():
     clear_frames()
 
@@ -740,6 +945,9 @@ def add_password_screen():
     button2 = tk.Button(add_frame, text="Return to Main Screen", padx=10, pady=10, fg="white", bg="black", command= return_to_main)
     button2.pack(side=tk.TOP, padx=5, pady=5)
 
+'''
+Returns to the main screen from the current screen.
+'''
 def return_to_main():
     main_screen()
 
@@ -747,6 +955,13 @@ def return_to_main():
     for container in passwords:
         print(str(container))
         get_output()
+
+
+'''
+Initializes the database for the password manager.
+Redirects standard output to StringIO object.
+Creates the root window for the application and calls the login screen.
+'''
 
 connect = sqlite3.connect("password_manager.db")
 cursor = connect.cursor()
