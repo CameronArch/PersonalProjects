@@ -1,0 +1,14 @@
+# Set default behavior to normalize whitespace and text handling
+* text=auto
+
+# Ensure consistent handling of specific file types
+
+# Handle Python files with specific whitespace and merge strategies
+*.py    indent-tabs-mode=false
+*.py    end-of-line=lf
+*.py    insert_final_newline=true
+
+# Handle assembly files with 4 spaces per tab and LF line endings
+*.asm   indent-tabs-mode=false
+*.asm   tabsize=4
+*.asm   end-of-line=lf
